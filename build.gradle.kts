@@ -8,7 +8,7 @@ group = "com.github.kr328.gradle.golang"
 version = "3.0.0"
 
 dependencies {
-    val agp = "8.0.1"
+    val agp = "8.9.2"
     val lombok = "1.18.26"
 
     annotationProcessor("org.projectlombok:lombok:$lombok")
