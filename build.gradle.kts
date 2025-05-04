@@ -9,7 +9,7 @@ version = "3.0.0"
 
 dependencies {
     val agp = "8.9.2"
-    val lombok = "1.18.26"
+    val lombok = "1.18.38"
 
     annotationProcessor("org.projectlombok:lombok:$lombok")
 
