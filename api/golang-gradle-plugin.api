@@ -1,0 +1,23 @@
+public class com/goooler/gradle/plugin/go/DefaultGoSourceSet : com/goooler/gradle/plugin/go/GoSourceSet {
+	public fun <init> (Lorg/gradle/api/tasks/SourceSet;Lorg/gradle/api/model/ObjectFactory;)V
+	public fun getGo ()Lorg/gradle/api/file/SourceDirectorySet;
+	public fun go (Lorg/gradle/api/Action;)V
+}
+
+public abstract class com/goooler/gradle/plugin/go/GoPlugin : org/gradle/api/Plugin {
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public abstract interface class com/goooler/gradle/plugin/go/GoSourceSet {
+	public abstract fun getGo ()Lorg/gradle/api/file/SourceDirectorySet;
+	public abstract fun go (Lorg/gradle/api/Action;)V
+}
+
+public abstract class com/goooler/gradle/plugin/go/tasks/GoCompile : org/gradle/api/tasks/SourceTask {
+	public fun <init> (Lorg/gradle/process/ExecOperations;)V
+	public final fun compile ()V
+	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
+}
+

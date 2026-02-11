@@ -113,12 +113,12 @@ gradlePlugin {
   vcsUrl = providers.gradleProperty("POM_URL")
 
   plugins {
-    create("shadowPlugin") {
-      id = group.toString()
-      implementationClass = "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
+    create("goPlugin") {
+      id = "com.goooler.gradle.plugin.go"
+      implementationClass = "com.goooler.gradle.plugin.go.GoPlugin"
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
-      tags = listOf("onejar", "shade", "fatjar", "uberjar")
+      tags = listOf("go", "golang")
     }
   }
 
