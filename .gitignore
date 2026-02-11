@@ -1,21 +1,25 @@
+.fleet
 .gradle
-**/build/
-!**/src/**/build/
+.kotlin
+build
 
-# Ignore Gradle GUI config
-gradle-app.setting
+### Android Studio ###
+local.properties
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out
 
-# Avoid ignore Gradle wrappper properties
-!gradle-wrapper.properties
+### VS Code ###
+.vscode
+bin
 
-# Cache of project
-.gradletasknamecache
+### Mac OS ###
+.DS_Store
 
-# Eclipse Gradle plugin generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+### MkDocs ###
+docs/api
+site
