@@ -16,9 +16,11 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
 
   @TaskAction
   public fun compile() {
-    execOperations.exec { spec ->
-      spec.executable("go")
-      spec.args(listOf("build") + compilerArgs.get() + source.files.map { it.absolutePath })
-    }
+    execOperations
+      .exec { spec ->
+        spec.executable("go")
+        spec.args(listOf("build") + compilerArgs.get() + source.files.map { it.absolutePath })
+      }
+      .assertNormalExitValue()
   }
 }
