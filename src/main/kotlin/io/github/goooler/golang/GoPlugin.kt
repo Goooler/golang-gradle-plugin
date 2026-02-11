@@ -32,6 +32,7 @@ public abstract class GoPlugin : Plugin<Project> {
 
       project.tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) {
         it.source(goSourceSet.go)
+        it.outputFile.convention(project.layout.buildDirectory.file("go/bin/${sourceSet.name}"))
       }
     }
   }

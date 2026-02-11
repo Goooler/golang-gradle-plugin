@@ -19,5 +19,6 @@ public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/
 	public fun <init> (Lorg/gradle/process/ExecOperations;)V
 	public final fun compile ()V
 	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
 }
 
