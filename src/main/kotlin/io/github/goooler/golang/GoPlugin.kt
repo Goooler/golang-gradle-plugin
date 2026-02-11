@@ -1,6 +1,6 @@
-package com.goooler.gradle.plugin.go
+package io.github.goooler.golang
 
-import com.goooler.gradle.plugin.go.tasks.GoCompile
+import io.github.goooler.golang.tasks.GoCompile
 import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.Plugin

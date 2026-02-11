@@ -1,4 +1,4 @@
-package com.goooler.gradle.plugin.go.tasks
+package io.github.goooler.golang.tasks
 
 import javax.inject.Inject
 import org.gradle.api.provider.ListProperty

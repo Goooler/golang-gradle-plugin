@@ -114,8 +114,8 @@ gradlePlugin {
 
   plugins {
     create("goPlugin") {
-      id = "com.goooler.gradle.plugin.go"
-      implementationClass = "com.goooler.gradle.plugin.go.GoPlugin"
+      id = group.toString()
+      implementationClass = "io.github.goooler.golang.GoPlugin"
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
       tags = listOf("go", "golang")

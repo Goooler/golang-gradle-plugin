@@ -1,4 +1,4 @@
-package com.goooler.gradle.plugin.go
+package io.github.goooler.golang
 
 import org.gradle.api.Action
 import org.gradle.api.file.SourceDirectorySet

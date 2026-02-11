@@ -1,4 +1,4 @@
-package com.goooler.gradle.plugin.go
+package io.github.goooler.golang
 
 import assertk.assertThat
 import assertk.assertions.isInstanceOf
@@ -11,7 +11,7 @@ class GoPluginTest {
   @Test
   fun `plugin registers task and sourceSet extension`() {
     val project = ProjectBuilder.builder().build()
-    project.plugins.apply("com.goooler.gradle.plugin.go")
+    project.plugins.apply("io.github.goooler.golang")
 
     assertThat(project.tasks.findByName("compileGo")).isNotNull()
 

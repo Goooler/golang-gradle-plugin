@@ -1,4 +1,4 @@
-package com.goooler.gradle.plugin.go
+package io.github.goooler.golang
 
 import assertk.assertThat
 import assertk.assertions.contains
@@ -21,7 +21,7 @@ class GoPluginFunctionalTest {
     buildFile.writeText(
       """
       plugins {
-          id("com.goooler.gradle.plugin.go")
+          id("io.github.goooler.golang")
       }
       """
         .trimIndent()
