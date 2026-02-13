@@ -51,9 +51,3 @@ Before submitting a pull request:
 6. Run `./gradlew lint` to check for lint issues
 7. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 
-## Code Style Guidelines
-- Follow the Google Kotlin Style Guide
-- Use ktfmt for automatic formatting
-- All public declarations must have explicit visibility modifiers
-- Add KDoc comments for public APIs
-
