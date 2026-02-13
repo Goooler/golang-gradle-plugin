@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
+  // TODO: Re-enable once android.lint plugin version is fixed in libs.versions.toml
   // alias(libs.plugins.android.lint)
   alias(libs.plugins.jetbrains.dokka)
   alias(libs.plugins.mavenPublish)
@@ -37,6 +38,7 @@ kotlin {
   }
 }
 
+// TODO: Re-enable lint configuration once android.lint plugin is re-enabled
 // lint {
 //   baseline = file("gradle/lint-baseline.xml")
 //   ignoreTestFixturesSources = true
@@ -74,8 +76,9 @@ val testGradleVersion: String =
   }
 
 dependencies {
+  // TODO: Re-enable once android.lint plugin is re-enabled
   // lintChecks(libs.androidx.gradlePluginLints)
-  // compileOnly(libs.android.gradle.api)
+  // Note: android.gradle.api is not needed as we use plugin ID detection instead of AGP API
 }
 
 testing.suites {
