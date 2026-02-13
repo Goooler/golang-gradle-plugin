@@ -7,13 +7,13 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.plugins.JvmEcosystemPlugin
+import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 
 public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project) {
-    project.plugins.apply(JvmEcosystemPlugin::class.java)
+    project.plugins.apply(JavaBasePlugin::class.java)
 
     val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
     sourceSets.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME)
