@@ -51,12 +51,6 @@ Before submitting a pull request:
 6. Run `./gradlew lint` to check for lint issues
 7. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 
-Or simply run:
-```bash
-./gradlew build
-```
-This will run all checks and tests.
-
 ## Code Style Guidelines
 - Follow the Google Kotlin Style Guide
 - Use ktfmt for automatic formatting
