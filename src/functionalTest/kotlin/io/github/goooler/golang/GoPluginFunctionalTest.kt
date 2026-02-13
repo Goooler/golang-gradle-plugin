@@ -14,8 +14,11 @@ class GoPluginFunctionalTest {
 
   @field:TempDir lateinit var projectDir: File
 
-  private val buildFile by lazy { projectDir.resolve("build.gradle.kts") }
-  private val settingsFile by lazy { projectDir.resolve("settings.gradle.kts") }
+  private val buildFile
+    get() = projectDir.resolve("build.gradle.kts")
+
+  private val settingsFile
+    get() = projectDir.resolve("settings.gradle.kts")
 
   @Test
   fun `can run task`() {
