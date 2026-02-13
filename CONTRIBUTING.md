@@ -48,8 +48,8 @@ Before submitting a pull request:
 3. Run `./gradlew test` to ensure unit tests pass
 4. Run `./gradlew functionalTest` to ensure integration tests pass
 5. Run `./gradlew checkKotlinAbi` to verify API compatibility
-6. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
-7. Run `./gradlew lint` to check for lint issues
+6. Run `./gradlew lint` to check for lint issues
+7. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 
 Or simply run:
 ```bash
