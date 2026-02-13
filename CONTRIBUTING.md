@@ -12,7 +12,6 @@ This project uses [ktfmt](https://github.com/facebook/ktfmt) with Google style f
 
 ### Testing
 - **Run unit tests**: `./gradlew test`
-- **Run documentation tests**: `./gradlew documentTest`
 - **Run functional/integration tests**: `./gradlew functionalTest`
 
 ### API Management
