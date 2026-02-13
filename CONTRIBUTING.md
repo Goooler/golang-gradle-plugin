@@ -38,7 +38,7 @@ When fixing issues:
 When adding new features or APIs:
 1. Ensure proper visibility modifiers are used (this project has explicit API mode enabled)
 2. All public APIs must have explicit visibility modifiers and documentation
-3. Update API dumps by running `./gradlew apiDump` after adding public APIs
+3. Update API dumps by running `./gradlew updateKotlinAbi` after adding public APIs
 4. Add appropriate tests to cover the new functionality
 
 ### Before Submitting
