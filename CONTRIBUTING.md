@@ -15,8 +15,8 @@ This project uses [ktfmt](https://github.com/facebook/ktfmt) with Google style f
 - **Run functional/integration tests**: `./gradlew functionalTest`
 
 ### API Management
-- **Check API compatibility**: `./gradlew apiCheck`
-- **Update API dumps**: `./gradlew apiDump`
+- **Check API compatibility**: `./gradlew checkKotlinAbi`
+- **Update API dumps**: `./gradlew updateKotlinAbi`
 
 All public APIs must be explicitly documented and dumped to ensure API compatibility is maintained.
 
@@ -47,7 +47,7 @@ Before submitting a pull request:
 2. Run `./gradlew spotlessCheck` to verify code style
 3. Run `./gradlew test` to ensure unit tests pass
 4. Run `./gradlew functionalTest` to ensure integration tests pass
-5. Run `./gradlew apiCheck` to verify API compatibility
+5. Run `./gradlew checkKotlinAbi` to verify API compatibility
 6. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 7. Run `./gradlew lint` to check for lint issues
 
