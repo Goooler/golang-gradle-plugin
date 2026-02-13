@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.13.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.0)" variant="all" version="8.13.0">
+<issues format="6" by="lint 9.0.0" type="baseline" client="gradle" dependencies="false" name="AGP (9.0.0)" variant="all" version="9.0.0">
+
+    <issue
+        id="EagerGradleConfiguration"
+        message="Avoid using method get"
+        errorLine1="          configureAndroidCompile(compileTask.get(), androidExtension)"
+        errorLine2="                                              ~~~">
+        <location
+            file="src/main/kotlin/io/github/goooler/golang/GoPlugin.kt"
+            line="50"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="EagerGradleConfiguration"
+        message="Avoid using method get"
+        errorLine1="          configureAndroidCompile(compileTask.get(), androidExtension)"
+        errorLine2="                                              ~~~">
+        <location
+            file="src/main/kotlin/io/github/goooler/golang/GoPlugin.kt"
+            line="53"
+            column="47"/>
+    </issue>
 
 </issues>
