@@ -57,5 +57,3 @@ Before submitting a pull request:
 - All public declarations must have explicit visibility modifiers
 - Add KDoc comments for public APIs
 
-## Questions?
-If you have any questions or need help, feel free to open an issue for discussion.
