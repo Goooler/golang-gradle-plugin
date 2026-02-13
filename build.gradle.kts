@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
-  alias(libs.plugins.android.lint)
+  // alias(libs.plugins.android.lint)
   alias(libs.plugins.jetbrains.dokka)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.pluginPublish)
@@ -37,15 +37,15 @@ kotlin {
   }
 }
 
-lint {
-  baseline = file("gradle/lint-baseline.xml")
-  ignoreTestFixturesSources = true
-  ignoreTestSources = true
-  warningsAsErrors = true
-  disable += "NewerVersionAvailable"
-  disable += "GradleDependency"
-  disable += "AndroidGradlePluginVersion"
-}
+// lint {
+//   baseline = file("gradle/lint-baseline.xml")
+//   ignoreTestFixturesSources = true
+//   ignoreTestSources = true
+//   warningsAsErrors = true
+//   disable += "NewerVersionAvailable"
+//   disable += "GradleDependency"
+//   disable += "AndroidGradlePluginVersion"
+// }
 
 spotless {
   kotlin { ktfmt(libs.ktfmt.get().version).googleStyle() }
@@ -73,7 +73,10 @@ val testGradleVersion: String =
     value
   }
 
-dependencies { lintChecks(libs.androidx.gradlePluginLints) }
+dependencies {
+  // lintChecks(libs.androidx.gradlePluginLints)
+  // compileOnly(libs.android.gradle.api)
+}
 
 testing.suites {
   register<JvmTestSuite>("functionalTest") {

@@ -1,3 +1,22 @@
+public final class io/github/goooler/golang/AndroidArchitecture : java/lang/Enum {
+	public static final field ARM Lio/github/goooler/golang/AndroidArchitecture;
+	public static final field ARM64 Lio/github/goooler/golang/AndroidArchitecture;
+	public static final field X86 Lio/github/goooler/golang/AndroidArchitecture;
+	public static final field X86_64 Lio/github/goooler/golang/AndroidArchitecture;
+	public final fun getAbiName ()Ljava/lang/String;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getGoArch ()Ljava/lang/String;
+	public final fun getGoArm ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/goooler/golang/AndroidArchitecture;
+	public static fun values ()[Lio/github/goooler/golang/AndroidArchitecture;
+}
+
+public abstract interface class io/github/goooler/golang/GoAndroidExtension {
+	public abstract fun getApiLevel ()Lorg/gradle/api/provider/Property;
+	public abstract fun getArchitectures ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getNdkPath ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
 public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -9,10 +28,24 @@ public abstract interface class io/github/goooler/golang/GoSourceSet {
 	public abstract fun go (Lorg/gradle/api/Action;)V
 }
 
+public final class io/github/goooler/golang/tasks/GoBuildMode : java/lang/Enum {
+	public static final field C_ARCHIVE Lio/github/goooler/golang/tasks/GoBuildMode;
+	public static final field C_SHARED Lio/github/goooler/golang/tasks/GoBuildMode;
+	public static final field DEFAULT Lio/github/goooler/golang/tasks/GoBuildMode;
+	public static final field PLUGIN Lio/github/goooler/golang/tasks/GoBuildMode;
+	public static final field SHARED Lio/github/goooler/golang/tasks/GoBuildMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getMode ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/goooler/golang/tasks/GoBuildMode;
+	public static fun values ()[Lio/github/goooler/golang/tasks/GoBuildMode;
+}
+
 public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/tasks/SourceTask {
 	public fun <init> (Lorg/gradle/process/ExecOperations;)V
 	public final fun compile ()V
+	public abstract fun getBuildMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getEnvironment ()Lorg/gradle/api/provider/MapProperty;
 	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
 }
 
