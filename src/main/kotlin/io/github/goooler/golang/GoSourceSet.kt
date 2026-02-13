@@ -12,7 +12,7 @@ public interface GoSourceSet {
   public fun go(action: Action<in SourceDirectorySet>)
 }
 
-internal class DefaultGoSourceSet
+internal abstract class DefaultGoSourceSet
 @Inject
 constructor(sourceSet: SourceSet, objectFactory: ObjectFactory) : GoSourceSet {
   override val go: SourceDirectorySet =
