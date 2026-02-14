@@ -13,15 +13,15 @@ internal object AndroidConfigurer {
       project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
 
     androidComponents.onVariants { variant ->
-      val abis = setOf("arm64-v8a", "x86_64")
+      val abis = setOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
       val compileTasks =
         abis.map { abi ->
           val taskName =
             "compileGo${variant.name.replaceFirstChar { it.uppercase() }}${abi.replace("-", "").replaceFirstChar { it.uppercase() }}"
           val task =
-            project.tasks.register(taskName, GoCompile::class.java) {
-              it.buildMode.convention(GoBuildMode.C_SHARED)
-              it.environment.set(
+            project.tasks.register(taskName, GoCompile::class.java) { task ->
+              task.buildMode.convention(GoBuildMode.C_SHARED)
+              task.environment.set(
                 androidComponents.sdkComponents.ndkDirectory.map { ndkDir ->
                   mapOf(
                     "CGO_ENABLED" to "1",
@@ -42,9 +42,16 @@ internal object AndroidConfigurer {
                   )
                 }
               )
-              // TODO: Support variant-specific source sets
-              it.source("src/main/go")
-              it.outputFile.convention(
+
+              variant.sources.java?.let { javaSources ->
+                task.source(
+                  javaSources.all.map { directories ->
+                    directories.map { it.asFile.parentFile.resolve("go") }
+                  }
+                )
+              }
+
+              task.outputFile.convention(
                 project.layout.buildDirectory.file(
                   "intermediates/go/${variant.name}/$abi/lib${project.name}.so"
                 )
