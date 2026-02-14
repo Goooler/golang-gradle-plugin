@@ -4,7 +4,6 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
-import io.github.goooler.golang.internal.AndroidArch
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test

@@ -1,6 +1,5 @@
 package io.github.goooler.golang
 
-import io.github.goooler.golang.internal.AndroidConfigurer
 import io.github.goooler.golang.tasks.GoCompile
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -40,6 +39,6 @@ public abstract class GoPlugin : Plugin<Project> {
         }
       }
 
-      pluginManager.withPlugin("com.android.base") { AndroidConfigurer.configure(project) }
+      pluginManager.withPlugin("com.android.base") { configureAndroidVariants() }
     }
 }
