@@ -74,10 +74,11 @@ val testGradleVersion: String =
   }
 
 dependencies {
-  lintChecks(libs.androidx.gradlePluginLints)
   compileOnly(libs.android.gradle.api)
-  compileOnly(libs.android.gradle)
-  "testPluginClasspath"(libs.android.gradle)
+
+  testPluginClasspath(libs.android.gradle)
+
+  lintChecks(libs.androidx.gradlePluginLints)
 }
 
 testing.suites {
