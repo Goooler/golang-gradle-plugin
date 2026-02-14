@@ -114,6 +114,15 @@ testing.suites {
   }
 }
 
+// This part should be placed after testing.suites to ensure the test sourceSets are created.
+kotlin.target.compilations {
+  val main by getting
+  getByName("functionalTest") {
+    // Share main's output with functionalTest.
+    associateWith(main)
+  }
+}
+
 gradlePlugin {
   website = providers.gradleProperty("POM_URL")
   vcsUrl = providers.gradleProperty("POM_URL")

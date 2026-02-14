@@ -13,9 +13,8 @@ internal object AndroidConfigurer {
       project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
 
     androidComponents.onVariants { variant ->
-      val abis = setOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
       val compileTasks =
-        abis.map { abi ->
+        AndroidArch.values.map { abi ->
           val taskName =
             "compileGo${variant.name.replaceFirstChar { it.uppercase() }}${abi.replace("-", "").replaceFirstChar { it.uppercase() }}"
           val task =
@@ -104,5 +103,16 @@ internal object AndroidConfigurer {
         else -> error("Unsupported ABI: $abi")
       }
     return ndkDir.resolve("toolchains/llvm/prebuilt/$host/bin/$prefix$apiLevel-clang").absolutePath
+  }
+}
+
+internal enum class AndroidArch(val abi: String) {
+  ARM64_V8A("arm64-v8a"),
+  ARMEABI_V7A("armeabi-v7a"),
+  X86("x86"),
+  X86_64("x86_64");
+
+  companion object {
+    val values = entries.map { it.abi }
   }
 }

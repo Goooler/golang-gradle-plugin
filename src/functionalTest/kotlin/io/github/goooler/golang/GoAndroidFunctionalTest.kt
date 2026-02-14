@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
+import io.github.goooler.golang.internal.AndroidArch
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test
@@ -83,8 +84,7 @@ class GoAndroidFunctionalTest {
 
     assertThat(result.output).contains("BUILD SUCCESSFUL")
 
-    val abis = listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-    abis.forEach { abi ->
+    AndroidArch.values.forEach { abi ->
       val libFile = projectDir.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
       assertThat(libFile).all { exists() }
     }
@@ -162,8 +162,7 @@ class GoAndroidFunctionalTest {
 
     assertThat(result.output).contains("BUILD SUCCESSFUL")
 
-    val abis = listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-    abis.forEach { abi ->
+    AndroidArch.values.forEach { abi ->
       val libFile =
         projectDir.resolve("build/intermediates/go/demoDebug/$abi/libgo-android-test-flavors.so")
       assertThat(libFile).all { exists() }
