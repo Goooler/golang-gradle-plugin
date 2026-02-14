@@ -1,5 +1,6 @@
 package io.github.goooler.golang
 
+import io.github.goooler.golang.internal.AndroidConfigurer
 import io.github.goooler.golang.tasks.GoCompile
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -14,8 +15,10 @@ public abstract class GoPlugin : Plugin<Project> {
 
       val sourceSets =
         extensions.getByType(SourceSetContainer::class.java).apply {
-          maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME)
-          maybeCreate(SourceSet.TEST_SOURCE_SET_NAME)
+          if (project.configurations.findByName("implementation") == null) {
+            maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME)
+            maybeCreate(SourceSet.TEST_SOURCE_SET_NAME)
+          }
         }
 
       sourceSets.configureEach { sourceSet ->
@@ -31,9 +34,12 @@ public abstract class GoPlugin : Plugin<Project> {
             .apply { go.srcDir("src/${sourceSet.name}/go") }
 
         tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) {
+          it.buildMode.convention(GoBuildMode.EXE)
           it.source(goSourceSet.go)
           it.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
         }
       }
+
+      pluginManager.withPlugin("com.android.base") { AndroidConfigurer.configure(project) }
     }
 }

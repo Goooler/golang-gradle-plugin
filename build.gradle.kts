@@ -73,7 +73,12 @@ val testGradleVersion: String =
     value
   }
 
-dependencies { lintChecks(libs.androidx.gradlePluginLints) }
+dependencies {
+  lintChecks(libs.androidx.gradlePluginLints)
+  compileOnly(libs.android.gradle.api)
+  compileOnly(libs.android.gradle)
+  "testPluginClasspath"(libs.android.gradle)
+}
 
 testing.suites {
   register<JvmTestSuite>("functionalTest") {
