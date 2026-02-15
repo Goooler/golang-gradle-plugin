@@ -51,10 +51,11 @@ internal fun Project.configureAndroidVariants() {
         "mergeGoJniLibs${variant.name.capitalize()}",
         MergeGoJniLibsTask::class.java,
       ) { merge ->
-        compileTasks.forEach { (abi, task) ->
-          merge.abis.add(abi.abi)
-          merge.libraryFiles.add(task.flatMap { it.outputFile })
-        }
+        val libraryFiles =
+          compileTasks.map { (abi, task) ->
+            MergeGoJniLibsTask.LibraryFile(abi.abi, task.map { it.outputFile })
+          }
+        merge.libraryFiles.convention(libraryFiles)
         merge.destinationDir.convention(
           layout.buildDirectory.dir("generated/go/jniLibs/${variant.name}")
         )

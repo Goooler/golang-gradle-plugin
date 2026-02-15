@@ -4,10 +4,12 @@ import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -19,24 +21,21 @@ internal abstract class MergeGoJniLibsTask
 @Inject
 constructor(private val fileSystemOperations: FileSystemOperations) : DefaultTask() {
 
-  @get:Input abstract val abis: ListProperty<String>
-
-  @get:InputFiles
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  abstract val libraryFiles: ListProperty<RegularFile>
+  @get:Nested // Can't use MapProperty instead, must wrap properties in a nested bean.
+  abstract val libraryFiles: ListProperty<LibraryFile>
 
   @get:OutputDirectory abstract val destinationDir: DirectoryProperty
 
   @TaskAction
   fun merge() {
-    val abisList = abis.get()
-    val filesList = libraryFiles.get()
-    check(abisList.size == filesList.size) {
-      "Number of ABIs (${abisList.size}) does not match number of files (${filesList.size})"
-    }
     fileSystemOperations.sync { spec ->
       spec.into(destinationDir)
-      abisList.zip(filesList).forEach { (abi, file) -> spec.from(file) { it.into(abi) } }
+      libraryFiles.get().forEach { (abi, file) -> spec.from(file) { it.into(abi) } }
     }
   }
+
+  data class LibraryFile(
+    @Input val abi: String,
+    @InputFile @get:PathSensitive(PathSensitivity.RELATIVE) val file: Provider<RegularFileProperty>,
+  )
 }
