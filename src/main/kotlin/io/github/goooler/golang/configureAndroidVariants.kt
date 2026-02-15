@@ -39,7 +39,6 @@ internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Local
 
 internal fun Project.configureAndroidVariants() {
   val androidComponents = extensions.getByType(AndroidComponentsExtension::class.java)
-  val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
 
   androidComponents.onVariants { variant ->
     val compileTasks =
@@ -49,7 +48,7 @@ internal fun Project.configureAndroidVariants() {
           tasks.register(taskName, GoCompile::class.java) { task ->
             task.buildMode.convention(GoBuildMode.C_SHARED)
             task.environment.convention(
-              ndkDirectory.map { ndkDir ->
+              androidComponents.sdkComponents.ndkDirectory.map { ndkDir ->
                 mapOf(
                   "CGO_ENABLED" to "1",
                   "GOOS" to "android",
