@@ -2,10 +2,10 @@ package io.github.goooler.golang
 
 import com.android.build.api.variant.AndroidComponentsExtension
 import io.github.goooler.golang.tasks.GoCompile
+import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
-import org.gradle.api.tasks.Sync
 
 internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Locale.ROOT) }
 
@@ -47,20 +47,20 @@ internal fun Project.configureAndroidVariants() {
       }
 
     val mergeTask =
-      tasks.register("mergeGoJniLibs${variant.name.capitalize()}", Sync::class.java) { sync ->
-        compileTasks.forEach { (abi, task) -> sync.from(task) { it.into(abi.abi) } }
-        sync.into(layout.buildDirectory.dir("generated/go/jniLibs/${variant.name}"))
+      tasks.register(
+        "mergeGoJniLibs${variant.name.capitalize()}",
+        MergeGoJniLibsTask::class.java,
+      ) { merge ->
+        compileTasks.forEach { (abi, task) ->
+          merge.abis.add(abi.abi)
+          merge.libraryFiles.add(task.flatMap { it.outputFile })
+        }
+        merge.destinationDir.convention(
+          layout.buildDirectory.dir("generated/go/jniLibs/${variant.name}")
+        )
       }
 
-    variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) {
-      objects.directoryProperty().fileProvider(provider { it.destinationDir })
-    }
-    val mergeJniLibFolders = "merge${variant.name.capitalize()}JniLibFolders"
-    tasks.configureEach {
-      if (it.name == mergeJniLibFolders) {
-        it.dependsOn(mergeTask)
-      }
-    }
+    variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
   }
 }
 
