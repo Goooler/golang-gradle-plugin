@@ -9,15 +9,21 @@ on:
 
 jobs:
   build:
+    name: OS=${{ matrix.os }}, Gradle=${{ matrix.gradle }}
     strategy:
-      fail-fast: false
       matrix:
-        os: [ macos-latest, macos-26, macos-15-intel, ubuntu-latest ]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+        # Test on the minimum Gradle version and the latest.
+        gradle: [ 9.0.0, current ]
     runs-on: ${{ matrix.os }}
     steps:
-      - run: |
-          echo -e "package main\n\nfunc main() {}" > main.go
-          go build -o main main.go
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version-file: .github/workflows/.java-version
+      - uses: gradle/actions/setup-gradle@v5
+      - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace
 
   # Status check that is required in branch protection rules.
   build-status:
