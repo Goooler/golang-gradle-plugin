@@ -12,7 +12,7 @@ jobs:
     name: OS=${{ matrix.os }}, Gradle=${{ matrix.gradle }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         # Test on the minimum Gradle version and the latest.
         gradle: [ 9.0.0, current ]
     runs-on: ${{ matrix.os }}
