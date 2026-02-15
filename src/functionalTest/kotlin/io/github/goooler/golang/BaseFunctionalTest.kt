@@ -47,6 +47,7 @@ abstract class BaseFunctionalTest {
     return gradleRunner(
       projectDir = projectRoot,
       arguments = commonGradleArgs + arguments,
+      warningsAsErrors = false, // TODO: enable it after bumping AGP to 9.0+.
       block = block,
     )
   }
