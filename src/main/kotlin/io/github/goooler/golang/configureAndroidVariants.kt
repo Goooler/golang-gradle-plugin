@@ -96,7 +96,11 @@ internal fun Project.configureAndroidVariants() {
 private fun AndroidArch.toClangPath(ndkDir: File, apiLevel: Int): String {
   val host =
     when (OS.current) {
-      OS.MACOS -> "darwin-x86_64"
+      OS.MACOS -> {
+        val arch = System.getProperty("os.arch").lowercase(Locale.US)
+        val isArm = arch.contains("aarch64") || arch.contains("arm64")
+        if (isArm) "darwin-arm64" else "darwin-x86_64"
+      }
       OS.WINDOWS -> "windows-x86_64"
       OS.LINUX -> "linux-x86_64"
     }
