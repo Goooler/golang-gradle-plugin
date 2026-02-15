@@ -7,6 +7,34 @@ import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
 
+internal enum class AndroidArch(val abi: String, val normalized: String) {
+  ARM64_V8A("arm64-v8a", "arm64"),
+  ARMEABI_V7A("armeabi-v7a", "arm32"),
+  X86("x86", "x86"),
+  X86_64("x86_64", "x64");
+
+  companion object {
+    val values = entries.map { it.abi }
+  }
+}
+
+internal enum class OS {
+  WINDOWS,
+  MACOS,
+  LINUX;
+
+  companion object {
+    val current: OS = run {
+      val os = System.getProperty("os.name").lowercase(Locale.US)
+      when {
+        os.contains("win") -> WINDOWS
+        os.contains("mac") -> MACOS
+        else -> LINUX
+      }
+    }
+  }
+}
+
 internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Locale.ROOT) }
 
 internal fun Project.configureAndroidVariants() {
@@ -62,34 +90,6 @@ internal fun Project.configureAndroidVariants() {
       }
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
-  }
-}
-
-internal enum class AndroidArch(val abi: String, val normalized: String) {
-  ARM64_V8A("arm64-v8a", "arm64"),
-  ARMEABI_V7A("armeabi-v7a", "arm32"),
-  X86("x86", "x86"),
-  X86_64("x86_64", "x64");
-
-  companion object {
-    val values = entries.map { it.abi }
-  }
-}
-
-internal enum class OS {
-  WINDOWS,
-  MACOS,
-  LINUX;
-
-  companion object {
-    val current: OS = run {
-      val os = System.getProperty("os.name").lowercase(Locale.US)
-      when {
-        os.contains("win") -> WINDOWS
-        os.contains("mac") -> MACOS
-        else -> LINUX
-      }
-    }
   }
 }
 
