@@ -41,7 +41,7 @@ internal fun Project.configureAndroidVariants() {
   val androidComponents = extensions.getByType(AndroidComponentsExtension::class.java)
   val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
 
-  extensions.getByType(AndroidComponentsExtension::class.java).onVariants { variant ->
+  androidComponents.onVariants { variant ->
     val compileTasks =
       AndroidArch.entries.map { abi ->
         val taskName = "compileGo${variant.name.capitalize()}${abi.normalized.capitalize()}"
