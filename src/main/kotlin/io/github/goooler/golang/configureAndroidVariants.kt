@@ -60,9 +60,7 @@ internal fun Project.configureAndroidVariants() {
             )
 
             (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
-              task.source(
-                sources.all.map { dirs -> dirs.map { it.asFile.parentFile.resolve("go") } }
-              )
+              task.source(sources.all.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } })
             }
 
             task.outputFile.convention(
