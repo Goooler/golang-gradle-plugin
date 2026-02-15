@@ -11,6 +11,7 @@ jobs:
   build:
     name: OS=${{ matrix.os }}, Gradle=${{ matrix.gradle }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         # Test on the minimum Gradle version and the latest.
