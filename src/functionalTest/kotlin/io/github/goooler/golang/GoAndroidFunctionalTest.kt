@@ -4,21 +4,12 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
-import java.io.File
-import org.gradle.testkit.runner.GradleRunner
+import kotlin.io.path.createParentDirectories
+import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
-import org.junit.jupiter.api.io.TempDir
 
-class GoAndroidFunctionalTest {
-
-  @field:TempDir lateinit var projectDir: File
-
-  private val buildFile
-    get() = projectDir.resolve("build.gradle.kts")
-
-  private val settingsFile
-    get() = projectDir.resolve("settings.gradle.kts")
+class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
   @Test
   @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
@@ -45,7 +36,7 @@ class GoAndroidFunctionalTest {
     buildFile.writeText(
       """
       plugins {
-        id("com.android.library") version "8.8.0"
+        id("com.android.library")
         id("io.github.goooler.golang")
       }
 
@@ -61,8 +52,8 @@ class GoAndroidFunctionalTest {
     )
 
     // Create a dummy go file
-    val goFile = projectDir.resolve("src/main/go/main.go")
-    goFile.parentFile.mkdirs()
+    val goFile = projectRoot.resolve("src/main/go/main.go")
+    goFile.createParentDirectories()
     goFile.writeText(
       """
       package main
@@ -74,17 +65,12 @@ class GoAndroidFunctionalTest {
         .trimIndent()
     )
 
-    val runner = GradleRunner.create()
-    runner.forwardOutput()
-    runner.withPluginClasspath()
-    runner.withArguments("assembleDebug", "--stacktrace")
-    runner.withProjectDir(projectDir)
-    val result = runner.build()
+    val result = runWithSuccess("assembleDebug")
 
     assertThat(result.output).contains("BUILD SUCCESSFUL")
 
     AndroidArch.values.forEach { abi ->
-      val libFile = projectDir.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
+      val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
       assertThat(libFile).all { exists() }
     }
   }
@@ -114,7 +100,7 @@ class GoAndroidFunctionalTest {
     buildFile.writeText(
       """
       plugins {
-        id("com.android.library") version "8.8.0"
+        id("com.android.library")
         id("io.github.goooler.golang")
       }
 
@@ -139,8 +125,8 @@ class GoAndroidFunctionalTest {
     )
 
     // Create a dummy go file in demo source set
-    val goFile = projectDir.resolve("src/demo/go/demo.go")
-    goFile.parentFile.mkdirs()
+    val goFile = projectRoot.resolve("src/demo/go/demo.go")
+    goFile.createParentDirectories()
     goFile.writeText(
       """
       package main
@@ -152,18 +138,13 @@ class GoAndroidFunctionalTest {
         .trimIndent()
     )
 
-    val runner = GradleRunner.create()
-    runner.forwardOutput()
-    runner.withPluginClasspath()
-    runner.withArguments("assembleDemoDebug", "--stacktrace")
-    runner.withProjectDir(projectDir)
-    val result = runner.build()
+    val result = runWithSuccess("assembleDemoDebug")
 
     assertThat(result.output).contains("BUILD SUCCESSFUL")
 
     AndroidArch.values.forEach { abi ->
       val libFile =
-        projectDir.resolve("build/intermediates/go/demoDebug/$abi/libgo-android-test-flavors.so")
+        projectRoot.resolve("build/intermediates/go/demoDebug/$abi/libgo-android-test-flavors.so")
       assertThat(libFile).all { exists() }
     }
   }
