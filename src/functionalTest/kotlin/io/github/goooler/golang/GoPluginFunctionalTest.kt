@@ -26,6 +26,7 @@ class GoPluginFunctionalTest {
     buildFile.writeText(
       """
       plugins {
+          id("java")
           id("io.github.goooler.golang")
       }
       """
@@ -55,6 +56,7 @@ class GoPluginFunctionalTest {
     buildFile.writeText(
       """
       plugins {
+          id("java")
           id("io.github.goooler.golang")
       }
 
