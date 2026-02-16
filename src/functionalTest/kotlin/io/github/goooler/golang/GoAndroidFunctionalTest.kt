@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
+@EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
 class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
   @BeforeEach
@@ -36,7 +37,6 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   fun `can run android task`() {
     settingsFile.appendText(
       """
@@ -87,7 +87,6 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """
