@@ -1,6 +1,7 @@
 package io.github.goooler.golang
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import org.gradle.api.plugins.JavaPlugin
@@ -21,5 +22,27 @@ class GoPluginTest {
       project.extensions.getByType(SourceSetContainer::class.java).getByName("main")
     val goSourceSet = mainSourceSet.extensions.findByName("go")
     assertThat(goSourceSet).isNotNull().isInstanceOf(GoSourceSet::class)
+  }
+
+  @Test
+  fun `plugin extension has sourceSets container`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("io.github.goooler.golang")
+
+    val extension = project.extensions.getByType(GoExtension::class.java)
+    assertThat(extension.sourceSets).isNotNull()
+
+    extension.sourceSets.create("alpha")
+    assertThat(extension.sourceSets.findByName("alpha")).isNotNull()
+  }
+
+  @Test
+  fun `GolangPlugin outputDirOf returns correct paths`() {
+    val project = ProjectBuilder.builder().build()
+    val buildDir = project.layout.buildDirectory.get().asFile.absolutePath
+
+    assertThat(GoPlugin.outputDirOf(project, null, null)).isEqualTo("$buildDir/intermediates/go")
+    assertThat(GoPlugin.outputDirOf(project, "debug", "arm64-v8a"))
+      .isEqualTo("$buildDir/intermediates/go/debug/arm64-v8a")
   }
 }

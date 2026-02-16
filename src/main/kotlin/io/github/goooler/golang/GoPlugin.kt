@@ -1,6 +1,7 @@
 package io.github.goooler.golang
 
 import io.github.goooler.golang.tasks.GoCompile
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -8,7 +9,13 @@ import org.gradle.api.tasks.SourceSetContainer
 public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
-      val goExtension = extensions.create("golang", GoExtension::class.java)
+      val goExtension =
+        extensions.create("golang", GoExtension::class.java).apply {
+          sourceSets.all { sourceSet ->
+            sourceSet.packageName.convention(packageName)
+            sourceSet.buildTags.convention(buildTags)
+          }
+        }
 
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {
@@ -19,7 +26,7 @@ public abstract class GoPlugin : Plugin<Project> {
                 GoSourceSet::class.java,
                 "go",
                 DefaultGoSourceSet::class.java,
-                sourceSet,
+                sourceSet.name,
                 objects,
               )
               .apply {
@@ -40,4 +47,19 @@ public abstract class GoPlugin : Plugin<Project> {
 
       pluginManager.withPlugin("com.android.base") { configureAndroidVariants(goExtension) }
     }
+
+  public companion object {
+    @JvmStatic
+    public fun outputDirOf(project: Project, variant: String?, abi: String?): String {
+      return if (variant != null && abi != null) {
+        project.layout.buildDirectory
+          .file("intermediates/go/$variant/$abi")
+          .get()
+          .asFile
+          .absolutePath
+      } else {
+        project.layout.buildDirectory.file("intermediates/go").get().asFile.absolutePath
+      }
+    }
+  }
 }
