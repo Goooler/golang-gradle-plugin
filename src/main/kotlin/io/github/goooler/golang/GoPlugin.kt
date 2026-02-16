@@ -3,8 +3,6 @@ package io.github.goooler.golang
 import io.github.goooler.golang.tasks.GoCompile
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSetContainer
 
 public abstract class GoPlugin : Plugin<Project> {
@@ -45,20 +43,4 @@ public abstract class GoPlugin : Plugin<Project> {
 
       pluginManager.withPlugin("com.android.base") { configureAndroidVariants(goExtension) }
     }
-
-  public companion object {
-    @JvmStatic
-    public fun outputDirOf(
-      project: Project,
-      variantName: String? = null,
-      abiName: String? = null,
-    ): Provider<Directory> {
-      val buildDirectory = project.layout.buildDirectory
-      return if (variantName != null && abiName != null) {
-        buildDirectory.dir("intermediates/go/$variantName/$abiName")
-      } else {
-        buildDirectory.dir("intermediates/go")
-      }
-    }
-  }
 }

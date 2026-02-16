@@ -8,7 +8,6 @@ import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 
 internal enum class AndroidArch(val abi: String, val normalized: String) {
   ARM64_V8A("arm64-v8a", "arm64"),
@@ -101,21 +100,24 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
     if (goExtension.enableCmakeIntegration.getOrElse(true)) {
+      val goSourceSet = variant.sources.getByName("go")
       variant.externalNativeBuild?.let { enb ->
         enb.arguments.add(
-          GoPlugin.outputDirOf(project).map { dir: Directory ->
-            "-DGO_OUTPUT:STRING=${dir.asFile.absolutePath}"
+          compileTasks
+            .first()
+            .second
+            .flatMap { it.outputFile }
+            .map { file ->
+              "-DGO_OUTPUT:STRING=${file.asFile.parentFile.parentFile.parentFile.absolutePath}"
+            }
+        )
+        enb.arguments.add("-DFLAVOR_NAME:STRING=${variant.flavorName.orEmpty()}")
+        enb.arguments.add(
+          goSourceSet.all.map { dirs ->
+            val path = dirs.firstOrNull()?.asFile?.absolutePath.orEmpty()
+            "-DGO_SOURCE:STRING=$path"
           }
         )
-        enb.arguments.add("-DFLAVOR_NAME:STRING=${variant.flavorName ?: ""}")
-        (variant.sources.java ?: variant.sources.kotlin)?.static?.let { sources ->
-          enb.arguments.add(
-            sources.map { dirs ->
-              val path = dirs.firstOrNull()?.asFile?.parentFile?.resolve("go")?.absolutePath ?: ""
-              "-DGO_SOURCE:STRING=$path"
-            }
-          )
-        }
       }
 
       val cmakeName = if (variant.buildType == "debug") "Debug" else "RelWithDebInfo"

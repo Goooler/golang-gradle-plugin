@@ -74,7 +74,6 @@ val testGradleVersion: String =
   }
 
 dependencies {
-  compileOnly(libs.android.gradle)
   compileOnly(libs.android.gradle.api)
 
   testPluginClasspath(libs.android.gradle)
