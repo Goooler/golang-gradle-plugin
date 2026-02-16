@@ -54,6 +54,7 @@ internal fun Project.configureAndroidVariants() {
                   "CGO_ENABLED" to "1",
                   "GOOS" to "android",
                   "GOARCH" to abi.toGoArch(),
+                  "GOARM" to abi.toGoArm(),
                   "CC" to abi.toClangPath(ndkDir.asFile, variant.minSdk.apiLevel),
                 )
               }
@@ -115,4 +116,10 @@ private fun AndroidArch.toGoArch(): String =
     AndroidArch.ARMEABI_V7A -> "arm"
     AndroidArch.X86 -> "386"
     AndroidArch.X86_64 -> "amd64"
+  }
+
+private fun AndroidArch.toGoArm(): String =
+  when (this) {
+    AndroidArch.ARMEABI_V7A -> "7"
+    else -> ""
   }
