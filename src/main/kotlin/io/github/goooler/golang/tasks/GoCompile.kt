@@ -23,6 +23,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:Input public abstract val buildMode: Property<GoBuildMode>
   @get:Input @get:Optional public abstract val packageName: Property<String>
   @get:Input public abstract val buildTags: ListProperty<String>
+  @get:Input public abstract val outputFileName: Property<String>
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   @TaskAction
