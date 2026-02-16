@@ -38,7 +38,8 @@ internal enum class OS {
 internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Locale.ROOT) }
 
 internal fun Project.configureAndroidVariants() {
-  val androidComponents = extensions.getByType(AndroidComponentsExtension::class.java)
+  val androidComponents =
+    extensions.getByType(AndroidComponentsExtension::class.java).apply { registerSourceType("go") }
   val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
 
   androidComponents.onVariants { variant ->
@@ -61,7 +62,11 @@ internal fun Project.configureAndroidVariants() {
             )
 
             (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
-              task.source(sources.all.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } })
+              val goSourceDirs =
+                sources.static.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } }
+              val goSourceSet = variant.sources.getByName("go")
+              goSourceDirs.get().forEach { goSourceSet.addStaticSourceDirectory(it.absolutePath) }
+              task.source(goSourceDirs)
             }
 
             task.outputFile.convention(
