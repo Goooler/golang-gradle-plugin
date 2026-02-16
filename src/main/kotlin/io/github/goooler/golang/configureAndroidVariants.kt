@@ -1,6 +1,9 @@
+@file:Suppress("DEPRECATION")
+
 package io.github.goooler.golang
 
 import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.gradle.BaseExtension
 import io.github.goooler.golang.tasks.GoCompile
 import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
@@ -96,6 +99,42 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       }
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
+
+    if (goExtension.enableCmakeIntegration.getOrElse(true)) {
+      val cmakeName = if (variant.buildType == "debug") "Debug" else "RelWithDebInfo"
+      compileTasks.forEach { (abi, task) ->
+        tasks.configureEach { t ->
+          if (t.name == "buildCMake$cmakeName[${abi.abi}]") {
+            t.dependsOn(task)
+          }
+        }
+      }
+    }
+  }
+
+  if (goExtension.enableCmakeIntegration.getOrElse(true)) {
+    (project.extensions.findByName("android") as? BaseExtension)?.let { android ->
+      android.defaultConfig.externalNativeBuild.cmake {
+        arguments.add(
+          "-DGO_OUTPUT:STRING=${GoPlugin.outputDirOf(project).get().asFile.absolutePath}"
+        )
+        arguments.add("-DGO_SOURCE:STRING=${project.file("src/main/go").absolutePath}")
+      }
+      android.productFlavors.all {
+        // Use reflection-like access or safe casting to avoid internal API issues
+        try {
+          val method = javaClass.getMethod("getExternalNativeBuild")
+          val enb = method.invoke(this)
+          val cmakeMethod = enb.javaClass.getMethod("getCmake")
+          val cmake = cmakeMethod.invoke(enb)
+          val argsMethod = cmake.javaClass.getMethod("getArguments")
+          @Suppress("UNCHECKED_CAST") val args = argsMethod.invoke(cmake) as? MutableList<String>
+          args?.add("-DFLAVOR_NAME:STRING=$name")
+        } catch (e: Exception) {
+          // Ignore if not supported
+        }
+      }
+    }
   }
 }
 

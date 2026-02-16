@@ -10,7 +10,10 @@ import org.gradle.api.tasks.SourceSetContainer
 public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
-      val goExtension = extensions.create("golang", GoExtension::class.java)
+      val goExtension =
+        extensions.create("golang", GoExtension::class.java).apply {
+          enableCmakeIntegration.convention(true)
+        }
 
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {

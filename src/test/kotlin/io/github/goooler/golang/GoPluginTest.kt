@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.testfixtures.ProjectBuilder
@@ -22,6 +23,15 @@ class GoPluginTest {
       project.extensions.getByType(SourceSetContainer::class.java).getByName("main")
     val goSourceSet = mainSourceSet.extensions.findByName("go")
     assertThat(goSourceSet).isNotNull().isInstanceOf(GoSourceSet::class)
+  }
+
+  @Test
+  fun `plugin extension has enableCmakeIntegration default to true`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("io.github.goooler.golang")
+
+    val extension = project.extensions.getByType(GoExtension::class.java)
+    assertThat(extension.enableCmakeIntegration.get()).isTrue()
   }
 
   @Test
