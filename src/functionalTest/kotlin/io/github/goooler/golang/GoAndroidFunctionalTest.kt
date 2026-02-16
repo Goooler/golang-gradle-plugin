@@ -4,8 +4,11 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
+import assertk.assertions.isNotNull
+import java.util.jar.JarFile
 import kotlin.io.path.appendText
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -82,7 +85,22 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     AndroidArch.values.forEach { abi ->
       val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
-      assertThat(libFile).all { exists() }
+      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so"))
+        .exists()
+
+      val mergedLibFile =
+        projectRoot.resolve("build/generated/jniLibs/mergeGoJniLibsDebug/$abi/${libFile.name}")
+      assertThat(mergedLibFile).exists()
+    }
+
+    val aarFile = projectRoot.resolve("build/outputs/aar/go-android-test-debug.aar")
+    assertThat(aarFile).exists()
+
+    JarFile(aarFile.toFile()).use { jar ->
+      AndroidArch.values.forEach { abi ->
+        val entry = jar.getJarEntry("jni/$abi/libgo-android-test.so")
+        assertThat(entry).all { isNotNull() }
+      }
     }
   }
 
@@ -142,7 +160,21 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     AndroidArch.values.forEach { abi ->
       val libFile =
         projectRoot.resolve("build/intermediates/go/demoDebug/$abi/libgo-android-test-flavors.so")
-      assertThat(libFile).all { exists() }
+      assertThat(libFile).exists()
+
+      val mergedLibFile =
+        projectRoot.resolve("build/generated/jniLibs/mergeGoJniLibsDemoDebug/$abi/${libFile.name}")
+      assertThat(mergedLibFile).exists()
+    }
+
+    val aarFile = projectRoot.resolve("build/outputs/aar/go-android-test-flavors-demo-debug.aar")
+    assertThat(aarFile).exists()
+
+    JarFile(aarFile.toFile()).use { jar ->
+      AndroidArch.values.forEach { abi ->
+        val entry = jar.getJarEntry("jni/$abi/libgo-android-test-flavors.so")
+        assertThat(entry).all { isNotNull() }
+      }
     }
   }
 }
