@@ -82,6 +82,8 @@ dependencies {
 }
 
 testing.suites {
+  getByName<JvmTestSuite>("test") { dependencies { implementation(libs.android.gradle) } }
+
   register<JvmTestSuite>("functionalTest") {
     targets.configureEach {
       testTask {
