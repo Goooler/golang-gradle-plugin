@@ -18,9 +18,16 @@ public abstract interface class io/github/goooler/golang/GoExtension {
 }
 
 public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin {
+	public static final field Companion Lio/github/goooler/golang/GoPlugin$Companion;
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
+	public static final fun outputDirOf (Lorg/gradle/api/Project;Ljava/lang/String;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+}
+
+public final class io/github/goooler/golang/GoPlugin$Companion {
+	public final fun outputDirOf (Lorg/gradle/api/Project;Ljava/lang/String;Ljava/lang/String;)Lorg/gradle/api/provider/Provider;
+	public static synthetic fun outputDirOf$default (Lio/github/goooler/golang/GoPlugin$Companion;Lorg/gradle/api/Project;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/gradle/api/provider/Provider;
 }
 
 public abstract interface class io/github/goooler/golang/GoSourceSet {

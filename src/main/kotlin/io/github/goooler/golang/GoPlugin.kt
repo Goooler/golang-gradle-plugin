@@ -1,21 +1,16 @@
 package io.github.goooler.golang
 
 import io.github.goooler.golang.tasks.GoCompile
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSetContainer
 
 public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
-      val goExtension =
-        extensions.create("golang", GoExtension::class.java).apply {
-          sourceSets.all { sourceSet ->
-            sourceSet.packageName.convention(packageName)
-            sourceSet.buildTags.convention(buildTags)
-          }
-        }
+      val goExtension = extensions.create("golang", GoExtension::class.java)
 
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {
@@ -26,7 +21,7 @@ public abstract class GoPlugin : Plugin<Project> {
                 GoSourceSet::class.java,
                 "go",
                 DefaultGoSourceSet::class.java,
-                sourceSet.name,
+                sourceSet,
                 objects,
               )
               .apply {
@@ -50,15 +45,16 @@ public abstract class GoPlugin : Plugin<Project> {
 
   public companion object {
     @JvmStatic
-    public fun outputDirOf(project: Project, variant: String?, abi: String?): String {
-      return if (variant != null && abi != null) {
-        project.layout.buildDirectory
-          .file("intermediates/go/$variant/$abi")
-          .get()
-          .asFile
-          .absolutePath
+    public fun outputDirOf(
+      project: Project,
+      variantName: String? = null,
+      abiName: String? = null,
+    ): Provider<Directory> {
+      val buildDirectory = project.layout.buildDirectory
+      return if (variantName != null && abiName != null) {
+        buildDirectory.dir("intermediates/go/$variantName/$abiName")
       } else {
-        project.layout.buildDirectory.file("intermediates/go").get().asFile.absolutePath
+        buildDirectory.dir("intermediates/go")
       }
     }
   }

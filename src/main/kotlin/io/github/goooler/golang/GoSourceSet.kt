@@ -2,13 +2,13 @@ package io.github.goooler.golang
 
 import javax.inject.Inject
 import org.gradle.api.Action
-import org.gradle.api.Named
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.SourceSet
 
-public interface GoSourceSet : Named {
+public interface GoSourceSet {
   public val go: SourceDirectorySet
   public val packageName: Property<String>
   public val buildTags: ListProperty<String>
@@ -18,11 +18,9 @@ public interface GoSourceSet : Named {
 
 internal abstract class DefaultGoSourceSet
 @Inject
-constructor(private val name: String, objectFactory: ObjectFactory) : GoSourceSet {
-  override fun getName(): String = name
-
+constructor(sourceSet: SourceSet, objectFactory: ObjectFactory) : GoSourceSet {
   override val go: SourceDirectorySet =
-    objectFactory.sourceDirectorySet("go", "$name Go source").apply {
+    objectFactory.sourceDirectorySet("go", "${sourceSet.name} Go source").apply {
       filter.include("**/*.go")
     }
 

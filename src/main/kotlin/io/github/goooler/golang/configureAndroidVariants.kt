@@ -96,16 +96,6 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       }
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
-
-    // Automatically link Go compile tasks with CMake build tasks if CMake is used.
-    val cmakeName = if (variant.buildType == "debug") "Debug" else "RelWithDebInfo"
-    compileTasks.forEach { (abi, task) ->
-      tasks.configureEach { t ->
-        if (t.name == "buildCMake$cmakeName[${abi.abi}]") {
-          t.dependsOn(task)
-        }
-      }
-    }
   }
 }
 
