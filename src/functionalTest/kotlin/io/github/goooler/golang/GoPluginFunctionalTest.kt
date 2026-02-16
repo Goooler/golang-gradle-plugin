@@ -4,9 +4,11 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 
 class GoPluginFunctionalTest : BaseFunctionalTest() {
@@ -105,5 +107,13 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     assertThat(result.output).contains("BUILD SUCCESSFUL")
     val task = result.task(":compileGo")
     assertThat(task).isNotNull()
+    assertThat(task?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+    // Verify the output file was created
+    val outputFile = projectRoot.resolve("build/go/bin/main")
+    assertThat(outputFile).exists()
+
+    // Verify that -tags argument was passed to go build
+    assertThat(result.output).contains("-tags")
   }
 }
