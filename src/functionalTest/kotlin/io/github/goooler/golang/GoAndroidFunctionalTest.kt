@@ -4,16 +4,17 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
+import kotlin.io.path.appendText
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
 class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
-  @Test
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
-  fun `can run android task`() {
+  @BeforeEach
+  fun beforeEach() {
     settingsFile.writeText(
       """
       pluginManagement {
@@ -29,6 +30,16 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
           mavenCentral()
         }
       }
+      """
+        .trimIndent() + System.lineSeparator()
+    )
+  }
+
+  @Test
+  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
+  fun `can run android task`() {
+    settingsFile.appendText(
+      """
       rootProject.name = "go-android-test"
       """
         .trimIndent()
@@ -78,21 +89,8 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   @Test
   @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   fun `can run android task with flavors`() {
-    settingsFile.writeText(
+    settingsFile.appendText(
       """
-      pluginManagement {
-        repositories {
-          google()
-          mavenCentral()
-          gradlePluginPortal()
-        }
-      }
-      dependencyResolutionManagement {
-        repositories {
-          google()
-          mavenCentral()
-        }
-      }
       rootProject.name = "go-android-test-flavors"
       """
         .trimIndent()
