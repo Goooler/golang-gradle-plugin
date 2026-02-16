@@ -3,12 +3,12 @@
 package io.github.goooler.golang
 
 import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.gradle.BaseExtension
 import io.github.goooler.golang.tasks.GoCompile
 import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 
 internal enum class AndroidArch(val abi: String, val normalized: String) {
   ARM64_V8A("arm64-v8a", "arm64"),
@@ -101,37 +101,29 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
     if (goExtension.enableCmakeIntegration.getOrElse(true)) {
+      variant.externalNativeBuild?.let { enb ->
+        enb.arguments.add(
+          GoPlugin.outputDirOf(project).map { dir: Directory ->
+            "-DGO_OUTPUT:STRING=${dir.asFile.absolutePath}"
+          }
+        )
+        enb.arguments.add("-DFLAVOR_NAME:STRING=${variant.flavorName ?: ""}")
+        (variant.sources.java ?: variant.sources.kotlin)?.static?.let { sources ->
+          enb.arguments.add(
+            sources.map { dirs ->
+              val path = dirs.firstOrNull()?.asFile?.parentFile?.resolve("go")?.absolutePath ?: ""
+              "-DGO_SOURCE:STRING=$path"
+            }
+          )
+        }
+      }
+
       val cmakeName = if (variant.buildType == "debug") "Debug" else "RelWithDebInfo"
       compileTasks.forEach { (abi, task) ->
         tasks.configureEach { t ->
           if (t.name == "buildCMake$cmakeName[${abi.abi}]") {
             t.dependsOn(task)
           }
-        }
-      }
-    }
-  }
-
-  if (goExtension.enableCmakeIntegration.getOrElse(true)) {
-    (project.extensions.findByName("android") as? BaseExtension)?.let { android ->
-      android.defaultConfig.externalNativeBuild.cmake {
-        arguments.add(
-          "-DGO_OUTPUT:STRING=${GoPlugin.outputDirOf(project).get().asFile.absolutePath}"
-        )
-        arguments.add("-DGO_SOURCE:STRING=${project.file("src/main/go").absolutePath}")
-      }
-      android.productFlavors.all {
-        // Use reflection-like access or safe casting to avoid internal API issues
-        try {
-          val method = javaClass.getMethod("getExternalNativeBuild")
-          val enb = method.invoke(this)
-          val cmakeMethod = enb.javaClass.getMethod("getCmake")
-          val cmake = cmakeMethod.invoke(enb)
-          val argsMethod = cmake.javaClass.getMethod("getArguments")
-          @Suppress("UNCHECKED_CAST") val args = argsMethod.invoke(cmake) as? MutableList<String>
-          args?.add("-DFLAVOR_NAME:STRING=$name")
-        } catch (e: Exception) {
-          // Ignore if not supported
         }
       }
     }
