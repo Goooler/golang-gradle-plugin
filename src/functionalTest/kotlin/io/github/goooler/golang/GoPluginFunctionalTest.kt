@@ -67,4 +67,43 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     val outputFile = projectRoot.resolve("build/custom-output")
     assertThat(outputFile).all { exists() }
   }
+
+  @Test
+  fun `can configure packageName and buildTags`() {
+    settingsFile.writeText("")
+    buildFile.writeText(
+      """
+      plugins {
+          id("java")
+          id("io.github.goooler.golang")
+      }
+
+      golang {
+          packageName.set("example.com/myapp")
+          buildTags.set(listOf("mytag"))
+      }
+      """
+        .trimIndent()
+    )
+
+    // Create a dummy go.mod
+    projectRoot.resolve("go.mod").writeText("module example.com/myapp\ngo 1.16")
+
+    // Create a dummy go file
+    val goFile = projectRoot.resolve("main.go")
+    goFile.writeText(
+      """
+      //go:build mytag
+      package main
+      func main() {}
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("compileGo")
+
+    assertThat(result.output).contains("BUILD SUCCESSFUL")
+    val task = result.task(":compileGo")
+    assertThat(task).isNotNull()
+  }
 }
