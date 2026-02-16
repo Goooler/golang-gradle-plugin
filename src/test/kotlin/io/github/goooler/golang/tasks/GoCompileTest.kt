@@ -62,25 +62,24 @@ class GoCompileTest {
     android.namespace = "com.example.go"
     android.defaultConfig { minSdk = 24 }
 
-    // Trigger onVariants
-    @Suppress("DEPRECATION") (project as org.gradle.api.internal.project.ProjectInternal).evaluate()
+    project.afterEvaluate {
+      val taskName = "compileGoDebugArm64"
+      val task = project.tasks.named(taskName, GoCompile::class.java).get()
 
-    val taskName = "compileGoDebugArm64"
-    val task = project.tasks.named(taskName, GoCompile::class.java).get()
-
-    assertThat(task.buildMode.get()).isEqualTo(GoBuildMode.C_SHARED)
-    assertThat(task.environment.get()).all {
-      hasSize(5)
-      contains("CGO_ENABLED", "1")
-      contains("GOOS", "android")
-      contains("GOARCH", "arm64")
-      key("GOARM").isEmpty()
-      key("CC")
-        .transform { Path(it) }
-        .all {
-          exists()
-          isExecutable()
-        }
+      assertThat(task.buildMode.get()).isEqualTo(GoBuildMode.C_SHARED)
+      assertThat(task.environment.get()).all {
+        hasSize(5)
+        contains("CGO_ENABLED", "1")
+        contains("GOOS", "android")
+        contains("GOARCH", "arm64")
+        key("GOARM").isEmpty()
+        key("CC")
+          .transform { Path(it) }
+          .all {
+            exists()
+            isExecutable()
+          }
+      }
     }
   }
 }
