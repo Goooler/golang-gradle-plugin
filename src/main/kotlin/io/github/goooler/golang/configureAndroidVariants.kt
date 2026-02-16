@@ -27,7 +27,7 @@ internal enum class OS {
     val current: OS = run {
       val os = System.getProperty("os.name").lowercase(Locale.US)
       when {
-        os.contains("win") -> WINDOWS
+        os.startsWith("win") -> WINDOWS
         os.contains("mac") -> MACOS
         else -> LINUX
       }
