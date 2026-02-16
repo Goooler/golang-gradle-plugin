@@ -30,7 +30,7 @@ class GoCompileTest {
     val compileGo = project.tasks.named("compileGo", GoCompile::class.java).get()
 
     assertThat(compileGo.buildMode.get()).isEqualTo(GoBuildMode.EXE)
-    assertThat(compileGo.outputFile.get().asFile.path).endsWith("go/bin/main")
+    assertThat(compileGo.outputFile.get().asFile.invariantSeparatorsPath).endsWith("go/bin/main")
     assertThat(compileGo.compilerArgs.get()).isEqualTo(emptyList<String>())
     assertThat(compileGo.source.isEmpty).isEqualTo(true)
   }
