@@ -8,6 +8,8 @@ import org.gradle.api.tasks.SourceSetContainer
 public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
+      val goExtension = extensions.create("golang", GoExtension::class.java)
+
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {
         extensions.getByType(SourceSetContainer::class.java).configureEach { sourceSet ->
@@ -20,16 +22,22 @@ public abstract class GoPlugin : Plugin<Project> {
                 sourceSet,
                 objects,
               )
-              .apply { go.srcDir("src/${sourceSet.name}/go") }
+              .apply {
+                go.srcDir("src/${sourceSet.name}/go")
+                packageName.convention(goExtension.packageName)
+                buildTags.convention(goExtension.buildTags)
+              }
 
           tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) {
             it.buildMode.convention(GoBuildMode.EXE)
             it.source(goSourceSet.go)
+            it.packageName.convention(goSourceSet.packageName)
+            it.buildTags.convention(goSourceSet.buildTags)
             it.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
           }
         }
       }
 
-      pluginManager.withPlugin("com.android.base") { configureAndroidVariants() }
+      pluginManager.withPlugin("com.android.base") { configureAndroidVariants(goExtension) }
     }
 }

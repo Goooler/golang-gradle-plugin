@@ -37,7 +37,7 @@ internal enum class OS {
 
 internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Locale.ROOT) }
 
-internal fun Project.configureAndroidVariants() {
+internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
   val androidComponents =
     extensions.getByType(AndroidComponentsExtension::class.java).apply { registerSourceType("go") }
   val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
@@ -49,6 +49,8 @@ internal fun Project.configureAndroidVariants() {
         val task =
           tasks.register(taskName, GoCompile::class.java) { task ->
             task.buildMode.convention(GoBuildMode.C_SHARED)
+            task.packageName.convention(goExtension.packageName)
+            task.buildTags.convention(goExtension.buildTags)
             task.environment.convention(
               ndkDirectory.map { ndkDir ->
                 mapOf(

@@ -12,6 +12,11 @@ public final class io/github/goooler/golang/GoBuildMode : java/lang/Enum {
 	public static fun values ()[Lio/github/goooler/golang/GoBuildMode;
 }
 
+public abstract interface class io/github/goooler/golang/GoExtension {
+	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
+}
+
 public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -19,7 +24,9 @@ public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin 
 }
 
 public abstract interface class io/github/goooler/golang/GoSourceSet {
+	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getGo ()Lorg/gradle/api/file/SourceDirectorySet;
+	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 	public abstract fun go (Lorg/gradle/api/Action;)V
 }
 
@@ -27,8 +34,10 @@ public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/
 	public fun <init> (Lorg/gradle/process/ExecOperations;)V
 	public final fun compile ()V
 	public abstract fun getBuildMode ()Lorg/gradle/api/provider/Property;
+	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getEnvironment ()Lorg/gradle/api/provider/MapProperty;
 	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 }
 
