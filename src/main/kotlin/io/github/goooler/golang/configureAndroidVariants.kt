@@ -93,7 +93,7 @@ internal fun Project.configureAndroidVariants() {
 private fun AndroidArch.toClangPath(ndkDir: File, apiLevel: Int): String {
   val host =
     when (OS.current) {
-      OS.MACOS -> "darwin-x86_64" // TODO: support Apple Silicon if NKD supports it.
+      OS.MACOS -> "darwin-x86_64" // TODO: support Apple Silicon if NDK supports it.
       OS.WINDOWS -> "windows-x86_64"
       OS.LINUX -> "linux-x86_64"
     }
