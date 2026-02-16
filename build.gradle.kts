@@ -73,9 +73,17 @@ val testGradleVersion: String =
     value
   }
 
-dependencies { lintChecks(libs.androidx.gradlePluginLints) }
+dependencies {
+  compileOnly(libs.android.gradle.api)
+
+  testPluginClasspath(libs.android.gradle)
+
+  lintChecks(libs.androidx.gradlePluginLints)
+}
 
 testing.suites {
+  getByName<JvmTestSuite>("test") { dependencies { implementation(libs.android.gradle) } }
+
   register<JvmTestSuite>("functionalTest") {
     targets.configureEach {
       testTask {
@@ -105,6 +113,15 @@ testing.suites {
         }
       }
     }
+  }
+}
+
+// This part should be placed after testing.suites to ensure the test sourceSets are created.
+kotlin.target.compilations {
+  val main by getting
+  getByName("functionalTest") {
+    // Share main's output with functionalTest.
+    associateWith(main)
   }
 }
 

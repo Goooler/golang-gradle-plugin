@@ -1,8 +1,11 @@
 package io.github.goooler.golang.tasks
 
+import io.github.goooler.golang.GoBuildMode
 import javax.inject.Inject
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SourceTask
@@ -15,6 +18,8 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   SourceTask() {
 
   @get:Input public abstract val compilerArgs: ListProperty<String>
+  @get:Input public abstract val environment: MapProperty<String, String>
+  @get:Input public abstract val buildMode: Property<GoBuildMode>
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   @TaskAction
@@ -22,9 +27,12 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
     val output = outputFile.get().asFile.absolutePath
     execOperations
       .exec { spec ->
+        spec.environment(environment.get())
         spec.executable("go")
         spec.args(
-          listOf("build", "-o", output) + compilerArgs.get() + source.files.map { it.absolutePath }
+          listOf("build", "-buildmode=${buildMode.get().mode}", "-o", output) +
+            compilerArgs.get() +
+            source.files.map { it.absolutePath }
         )
       }
       .assertNormalExitValue()

@@ -1,3 +1,17 @@
+public final class io/github/goooler/golang/GoBuildMode : java/lang/Enum {
+	public static final field ARCHIVE Lio/github/goooler/golang/GoBuildMode;
+	public static final field C_ARCHIVE Lio/github/goooler/golang/GoBuildMode;
+	public static final field C_SHARED Lio/github/goooler/golang/GoBuildMode;
+	public static final field EXE Lio/github/goooler/golang/GoBuildMode;
+	public static final field PIE Lio/github/goooler/golang/GoBuildMode;
+	public static final field PLUGIN Lio/github/goooler/golang/GoBuildMode;
+	public static final field SHARED Lio/github/goooler/golang/GoBuildMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getMode ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/goooler/golang/GoBuildMode;
+	public static fun values ()[Lio/github/goooler/golang/GoBuildMode;
+}
+
 public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -12,7 +26,9 @@ public abstract interface class io/github/goooler/golang/GoSourceSet {
 public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/tasks/SourceTask {
 	public fun <init> (Lorg/gradle/process/ExecOperations;)V
 	public final fun compile ()V
+	public abstract fun getBuildMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getEnvironment ()Lorg/gradle/api/provider/MapProperty;
 	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
 }
 

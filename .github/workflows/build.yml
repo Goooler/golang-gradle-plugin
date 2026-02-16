@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         # Test on the minimum Gradle version and the latest.
-        gradle: [ 9.0.0, current ]
+        gradle: [ 9.1.0, current ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
