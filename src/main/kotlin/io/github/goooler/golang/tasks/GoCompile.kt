@@ -23,6 +23,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:Input public abstract val buildMode: Property<GoBuildMode>
   @get:Input @get:Optional public abstract val packageName: Property<String>
   @get:Input public abstract val buildTags: ListProperty<String>
+  @get:Input public abstract val goExecutable: Property<String>
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   @TaskAction
@@ -33,7 +34,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
     execOperations
       .exec { spec ->
         spec.environment(environment.get())
-        spec.executable("go")
+        spec.executable(goExecutable.get())
         val args = mutableListOf("build", "-buildmode=${buildMode.get().mode}")
         if (tags.isNotEmpty()) {
           args.add("-tags")

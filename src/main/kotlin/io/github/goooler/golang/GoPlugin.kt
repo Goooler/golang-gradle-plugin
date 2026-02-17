@@ -33,6 +33,9 @@ public abstract class GoPlugin : Plugin<Project> {
             it.source(goSourceSet.go)
             it.packageName.convention(goSourceSet.packageName)
             it.buildTags.convention(goSourceSet.buildTags)
+            it.goExecutable.convention(
+              goExtension.goExecutable.orElse(GoExecutableResolver.resolve(providers)),
+            )
             it.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
           }
         }

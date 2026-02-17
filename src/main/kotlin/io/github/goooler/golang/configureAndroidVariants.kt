@@ -51,6 +51,9 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             task.buildMode.convention(GoBuildMode.C_SHARED)
             task.packageName.convention(goExtension.packageName)
             task.buildTags.convention(goExtension.buildTags)
+            task.goExecutable.convention(
+              goExtension.goExecutable.orElse(GoExecutableResolver.resolve(providers)),
+            )
             task.environment.convention(
               ndkDirectory.map { ndkDir ->
                 mapOf(
