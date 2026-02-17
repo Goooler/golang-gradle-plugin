@@ -3,6 +3,7 @@ package io.github.goooler.golang.tasks
 import io.github.goooler.golang.GoBuildMode
 import javax.inject.Inject
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -22,13 +23,13 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:Input public abstract val environment: MapProperty<String, String>
   @get:Input public abstract val buildMode: Property<GoBuildMode>
   @get:Input @get:Optional public abstract val packageName: Property<String>
-  @get:Input public abstract val buildTags: org.gradle.api.provider.ListProperty<String>
+  @get:Input public abstract val buildTags: ListProperty<String>
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
     // Initialize toolChain and targetPlatform with empty/null values
     // as they are required by AbstractNativeCompileTask but not used by Go compilation
-    toolChain.convention(null as NativeToolChain?)
+    toolChain.convention(null)
     targetPlatform.convention(null)
     // Set objectFileDir to a default location (required by AbstractNativeCompileTask)
     objectFileDir.convention(project.layout.buildDirectory.dir("go/obj"))
