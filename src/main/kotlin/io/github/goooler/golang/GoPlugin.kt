@@ -8,7 +8,10 @@ import org.gradle.api.tasks.SourceSetContainer
 public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
-      val goExtension = extensions.create("golang", GoExtension::class.java)
+      val goExtension =
+        extensions.create("golang", GoExtension::class.java).apply {
+          executable.convention(resolveGoExecutable(providers))
+        }
 
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {
@@ -33,6 +36,7 @@ public abstract class GoPlugin : Plugin<Project> {
             it.source(goSourceSet.go)
             it.packageName.convention(goSourceSet.packageName)
             it.buildTags.convention(goSourceSet.buildTags)
+            it.executable.convention(goExtension.executable)
             it.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
           }
         }
