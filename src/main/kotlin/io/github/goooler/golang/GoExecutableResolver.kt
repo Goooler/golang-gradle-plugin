@@ -24,6 +24,6 @@ internal fun resolveGoExecutable(providerFactory: ProviderFactory): Provider<Str
       OS.WINDOWS -> candidates.add(File("C:\\Program Files\\Go\\bin\\$goName"))
     }
 
-    candidates.firstOrNull { it.exists() && it.canExecute() }?.absolutePath ?: "go"
+    candidates.firstOrNull { it.exists() && it.isFile && it.canExecute() }?.absolutePath ?: "go"
   }
 }
