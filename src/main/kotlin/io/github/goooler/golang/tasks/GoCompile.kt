@@ -27,11 +27,14 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
   init {
-    // Initialize toolChain and targetPlatform with empty/null values
-    // as they are required by AbstractNativeCompileTask but not used by Go compilation
+    // AbstractNativeCompileTask defines toolChain, targetPlatform, and objectFileDir properties.
+    // For Go compilation, toolChain and targetPlatform are not used because:
+    // - Go uses its own toolchain (go compiler) configured via environment variables
+    // - Cross-compilation is handled via GOOS/GOARCH environment variables
+    // We set them to null as they are optional properties not needed for Go builds.
     toolChain.convention(null)
     targetPlatform.convention(null)
-    // Set objectFileDir to a default location (required by AbstractNativeCompileTask)
+    // objectFileDir is set to a default location for consistency with native compilation
     objectFileDir.convention(project.layout.buildDirectory.dir("go/obj"))
   }
 
