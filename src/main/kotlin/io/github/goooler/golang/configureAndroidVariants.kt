@@ -74,8 +74,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
             task.outputFileName.convention(goExtension.outputFileName)
             val outputFile =
-              layout.buildDirectory.zip(task.outputFileName) { dir, name ->
-                dir.file("intermediates/go/${variant.name}/${abi.abi}/$name")
+              layout.buildDirectory.zip(task.outputFileName) { dir, outputFileName ->
+                dir.file("intermediates/go/${variant.name}/${abi.abi}/$outputFileName")
               }
             task.outputFile.convention(outputFile)
           }
