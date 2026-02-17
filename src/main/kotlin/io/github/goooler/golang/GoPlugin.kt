@@ -31,13 +31,13 @@ public abstract class GoPlugin : Plugin<Project> {
                 buildTags.convention(goExtension.buildTags)
               }
 
-          tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) {
-            it.buildMode.convention(GoBuildMode.EXE)
-            it.source(goSourceSet.go)
-            it.packageName.convention(goSourceSet.packageName)
-            it.buildTags.convention(goSourceSet.buildTags)
-            it.executable.convention(goExtension.executable)
-            it.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
+          tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
+            task.buildMode.convention(GoBuildMode.EXE)
+            task.source(goSourceSet.go)
+            task.packageName.convention(goSourceSet.packageName)
+            task.buildTags.convention(goSourceSet.buildTags)
+            task.executable.convention(goExtension.executable)
+            task.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
           }
         }
       }
