@@ -10,6 +10,7 @@ public abstract class GoPlugin : Plugin<Project> {
     with(project) {
       val goExtension =
         extensions.create("golang", GoExtension::class.java).apply {
+          executable.convention(resolveGoExecutable(providers))
           outputFileName.convention("lib$name.so")
         }
 
@@ -36,6 +37,7 @@ public abstract class GoPlugin : Plugin<Project> {
             it.source(goSourceSet.go)
             it.packageName.convention(goSourceSet.packageName)
             it.buildTags.convention(goSourceSet.buildTags)
+            it.executable.convention(goExtension.executable)
             it.outputFileName.convention(goExtension.outputFileName)
             val outputFile =
               layout.buildDirectory.zip(it.outputFileName) { dir, name ->
