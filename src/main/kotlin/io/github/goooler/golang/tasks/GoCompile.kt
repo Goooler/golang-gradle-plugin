@@ -3,27 +3,36 @@ package io.github.goooler.golang.tasks
 import io.github.goooler.golang.GoBuildMode
 import javax.inject.Inject
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.language.nativeplatform.tasks.AbstractNativeSourceCompileTask
+import org.gradle.nativeplatform.toolchain.NativeToolChain
 import org.gradle.process.ExecOperations
 import org.gradle.work.DisableCachingByDefault
 
 @DisableCachingByDefault(because = "Go build is not cacheable yet")
 public abstract class GoCompile @Inject constructor(private val execOperations: ExecOperations) :
-  SourceTask() {
+  AbstractNativeSourceCompileTask() {
 
-  @get:Input public abstract val compilerArgs: ListProperty<String>
+  // Note: compilerArgs is inherited from AbstractNativeCompileTask as ListProperty<String>
   @get:Input public abstract val environment: MapProperty<String, String>
   @get:Input public abstract val buildMode: Property<GoBuildMode>
   @get:Input @get:Optional public abstract val packageName: Property<String>
-  @get:Input public abstract val buildTags: ListProperty<String>
+  @get:Input public abstract val buildTags: org.gradle.api.provider.ListProperty<String>
   @get:OutputFile public abstract val outputFile: RegularFileProperty
+
+  init {
+    // Initialize toolChain and targetPlatform with empty/null values
+    // as they are required by AbstractNativeCompileTask but not used by Go compilation
+    toolChain.convention(null as NativeToolChain?)
+    targetPlatform.convention(null)
+    // Set objectFileDir to a default location (required by AbstractNativeCompileTask)
+    objectFileDir.convention(project.layout.buildDirectory.dir("go/obj"))
+  }
 
   @TaskAction
   public fun compile() {
