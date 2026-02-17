@@ -15,12 +15,14 @@ internal fun resolveGoExecutable(providerFactory: ProviderFactory): Provider<Str
       candidates.add(File(goRoot, "bin/$goName"))
     }
 
+    val usrLocalGo = File("/usr/local/go/bin/$goName")
+
     when (os) {
       OS.MACOS -> {
-        candidates.add(File("/usr/local/go/bin/$goName"))
+        candidates.add(usrLocalGo)
         candidates.add(File("/opt/homebrew/bin/$goName"))
       }
-      OS.LINUX -> candidates.add(File("/usr/local/go/bin/$goName"))
+      OS.LINUX -> candidates.add(usrLocalGo)
       OS.WINDOWS -> candidates.add(File("C:\\Program Files\\Go\\bin\\$goName"))
     }
 
