@@ -16,26 +16,17 @@ public abstract class GoPlugin : Plugin<Project> {
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {
         extensions.getByType(SourceSetContainer::class.java).configureEach { sourceSet ->
-          val goSourceSet =
-            sourceSet.extensions
-              .create(
-                GoSourceSet::class.java,
-                "go",
-                DefaultGoSourceSet::class.java,
-                sourceSet,
-                objects,
-              )
-              .apply {
-                go.srcDir("src/${sourceSet.name}/go")
-                packageName.convention(goExtension.packageName)
-                buildTags.convention(goExtension.buildTags)
-              }
+          val goSourceDirectorySet =
+            objects.sourceDirectorySet("go", "${sourceSet.name} Go source").apply {
+              srcDir("src/${sourceSet.name}/go")
+              filter.include("**/*.go")
+            }
 
           tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
             task.buildMode.convention(GoBuildMode.EXE)
-            task.source(goSourceSet.go)
-            task.packageName.convention(goSourceSet.packageName)
-            task.buildTags.convention(goSourceSet.buildTags)
+            task.source(goSourceDirectorySet)
+            task.packageName.convention(goExtension.packageName)
+            task.buildTags.convention(goExtension.buildTags)
             task.executable.convention(goExtension.executable)
             task.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
           }
