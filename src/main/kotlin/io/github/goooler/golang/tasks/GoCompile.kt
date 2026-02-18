@@ -29,6 +29,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
 
   @TaskAction
   public fun compile() {
+    validateOutputFileName()
     val output = outputFile.get().asFile.absolutePath
     val tags = buildTags.get()
     val pkg = packageName.orNull
@@ -52,5 +53,22 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
         spec.args(args)
       }
       .assertNormalExitValue()
+  }
+
+  private fun validateOutputFileName() {
+    val fileName = outputFileName.get()
+    val invalidChars = listOf('/', '\\', ':', '*', '?', '"', '<', '>', '|')
+    val foundInvalidChars = invalidChars.filter { fileName.contains(it) }
+    
+    if (foundInvalidChars.isNotEmpty()) {
+      throw IllegalArgumentException(
+        "outputFileName '$fileName' contains invalid filesystem characters: ${foundInvalidChars.joinToString(", ") { "'$it'" }}. " +
+        "Please use a valid filename without path separators or special characters."
+      )
+    }
+    
+    if (fileName.isBlank()) {
+      throw IllegalArgumentException("outputFileName cannot be blank.")
+    }
   }
 }

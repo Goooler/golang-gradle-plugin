@@ -1,6 +1,7 @@
 package io.github.goooler.golang.tasks
 
 import assertk.all
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.endsWith
@@ -9,7 +10,9 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isExecutable
+import assertk.assertions.isInstanceOf
 import assertk.assertions.key
+import assertk.assertions.messageContains
 import com.android.build.api.dsl.LibraryExtension
 import io.github.goooler.golang.GoBuildMode
 import io.github.goooler.golang.GoPlugin
@@ -81,5 +84,55 @@ class GoCompileTest {
           }
       }
     }
+  }
+
+  @Test
+  fun `GoCompile validates outputFileName with invalid characters`() {
+    val project = ProjectBuilder.builder().build()
+    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
+    
+    // Setup minimal configuration
+    task.outputFile.set(project.file("out/invalid.so"))
+    task.buildMode.set(GoBuildMode.EXE)
+    task.executable.set("go")
+    task.outputFileName.set("invalid/filename.exe")
+    
+    assertFailure { task.compile() }
+      .isInstanceOf<IllegalArgumentException>()
+      .messageContains("invalid/filename.exe")
+      .messageContains("'/'")
+  }
+
+  @Test
+  fun `GoCompile validates outputFileName with multiple invalid characters`() {
+    val project = ProjectBuilder.builder().build()
+    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
+    
+    task.outputFile.set(project.file("out/invalid.so"))
+    task.buildMode.set(GoBuildMode.EXE)
+    task.executable.set("go")
+    task.outputFileName.set("invalid:file*name?.exe")
+    
+    assertFailure { task.compile() }
+      .isInstanceOf<IllegalArgumentException>()
+      .messageContains("invalid:file*name?.exe")
+      .messageContains("':'")
+      .messageContains("'*'")
+      .messageContains("'?'")
+  }
+
+  @Test
+  fun `GoCompile validates outputFileName is not blank`() {
+    val project = ProjectBuilder.builder().build()
+    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
+    
+    task.outputFile.set(project.file("out/blank.so"))
+    task.buildMode.set(GoBuildMode.EXE)
+    task.executable.set("go")
+    task.outputFileName.set("   ")
+    
+    assertFailure { task.compile() }
+      .isInstanceOf<IllegalArgumentException>()
+      .messageContains("cannot be blank")
   }
 }
