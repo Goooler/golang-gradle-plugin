@@ -11,16 +11,6 @@ public abstract class GoPlugin : Plugin<Project> {
       val goExtension =
         extensions.create("go", GoExtension::class.java).apply {
           executable.convention(resolveGoExecutable(providers))
-          buildMode.convention(GoBuildMode.EXE)
-          outputFileName.convention(
-            buildMode.map { mode ->
-              when (mode) {
-                GoBuildMode.EXE, GoBuildMode.PIE -> name
-                GoBuildMode.C_SHARED, GoBuildMode.SHARED, GoBuildMode.PLUGIN -> "lib$name.so"
-                else -> name
-              }
-            }
-          )
         }
 
       // org.gradle.api.plugins.JavaBasePlugin
@@ -34,12 +24,12 @@ public abstract class GoPlugin : Plugin<Project> {
 
           tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
             task.source(goSourceDirectorySet)
-            task.buildMode.convention(goExtension.buildMode)
+            task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.EXE))
             task.packageName.convention(goExtension.packageName)
             task.buildTags.convention(goExtension.buildTags)
             task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
-            task.outputFileName.convention(goExtension.outputFileName)
+            task.outputFileName.convention(goExtension.outputFileName.orElse(project.name))
             val outputFile =
               layout.buildDirectory.zip(task.outputFileName) { dir, fileName ->
                 dir.file("go/bin/${sourceSet.name}/$fileName")
