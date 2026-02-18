@@ -13,7 +13,9 @@ public final class io/github/goooler/golang/GoBuildMode : java/lang/Enum {
 }
 
 public abstract interface class io/github/goooler/golang/GoExtension {
+	public abstract fun getBuildMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getExecutable ()Lorg/gradle/api/provider/Property;
 	public abstract fun getOutputFileName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
@@ -23,13 +25,6 @@ public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin 
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
-}
-
-public abstract interface class io/github/goooler/golang/GoSourceSet {
-	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
-	public abstract fun getGo ()Lorg/gradle/api/file/SourceDirectorySet;
-	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
-	public abstract fun go (Lorg/gradle/api/Action;)V
 }
 
 public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/tasks/SourceTask {
