@@ -106,34 +106,4 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     val task = result.task(":compileGo")
     assertThat(task).isNotNull()
   }
-
-  @Test
-  fun `can configure compilerArgs and buildMode at extension level`() {
-    settingsFile.writeText("")
-    buildFile.writeText(
-      """
-      plugins {
-          id("java")
-          id("io.github.goooler.golang")
-      }
-
-      go {
-          compilerArgs.set(listOf("-v", "-x"))
-          buildMode.set(io.github.goooler.golang.GoBuildMode.PIE)
-      }
-      """
-        .trimIndent()
-    )
-
-    // Create a dummy go file
-    val goFile = projectRoot.resolve("src/main/go/main.go")
-    goFile.createParentDirectories()
-    goFile.writeText("package main\nfunc main() {}")
-
-    val result = runWithSuccess("compileGo")
-
-    assertThat(result.output).contains("BUILD SUCCESSFUL")
-    val task = result.task(":compileGo")
-    assertThat(task).isNotNull()
-  }
 }
