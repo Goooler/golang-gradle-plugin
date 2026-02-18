@@ -12,6 +12,8 @@ public interface GoSourceSet {
   public val go: SourceDirectorySet
   public val packageName: Property<String>
   public val buildTags: ListProperty<String>
+  public val compilerArgs: ListProperty<String>
+  public val buildMode: Property<GoBuildMode>
 
   public fun go(action: Action<in SourceDirectorySet>)
 }
@@ -27,6 +29,10 @@ constructor(sourceSet: SourceSet, objectFactory: ObjectFactory) : GoSourceSet {
   override val packageName: Property<String> = objectFactory.property(String::class.java)
 
   override val buildTags: ListProperty<String> = objectFactory.listProperty(String::class.java)
+
+  override val compilerArgs: ListProperty<String> = objectFactory.listProperty(String::class.java)
+
+  override val buildMode: Property<GoBuildMode> = objectFactory.property(GoBuildMode::class.java)
 
   override fun go(action: Action<in SourceDirectorySet>) {
     action.execute(go)
