@@ -17,6 +17,7 @@ public abstract interface class io/github/goooler/golang/GoExtension {
 	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getExecutable ()Lorg/gradle/api/provider/Property;
+	public abstract fun getOutputFileName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 }
 
@@ -35,6 +36,7 @@ public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/
 	public abstract fun getEnvironment ()Lorg/gradle/api/provider/MapProperty;
 	public abstract fun getExecutable ()Lorg/gradle/api/provider/Property;
 	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getOutputFileName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 }
 

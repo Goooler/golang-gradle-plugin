@@ -73,10 +73,13 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               task.source(goSourceDirs)
             }
 
+            task.outputFileName.convention(
+              goExtension.outputFileName.orElse("lib${project.name}.so")
+            )
             task.outputFile.convention(
-              layout.buildDirectory.file(
-                "intermediates/go/${variant.name}/${abi.abi}/lib${name}.so"
-              )
+              layout.buildDirectory.zip(task.outputFileName) { build, fileName ->
+                build.file("intermediates/go/${variant.name}/${abi.abi}/$fileName")
+              }
             )
           }
         abi to task

@@ -9,4 +9,5 @@ public interface GoExtension {
   public val compilerArgs: ListProperty<String>
   public val buildMode: Property<GoBuildMode>
   public val executable: Property<String>
+  public val outputFileName: Property<String>
 }

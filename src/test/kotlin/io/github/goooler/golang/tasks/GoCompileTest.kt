@@ -23,14 +23,14 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 class GoCompileTest {
   @Test
   fun `GoCompile properties for desktop are configured correctly`() {
-    val project = ProjectBuilder.builder().build()
+    val project = ProjectBuilder.builder().withName("gc").build()
     project.plugins.apply(JavaPlugin::class.java)
     project.plugins.apply(GoPlugin::class.java)
 
     val compileGo = project.tasks.named("compileGo", GoCompile::class.java).get()
 
     assertThat(compileGo.buildMode.get()).isEqualTo(GoBuildMode.EXE)
-    assertThat(compileGo.outputFile.get().asFile.invariantSeparatorsPath).endsWith("go/bin/main")
+    assertThat(compileGo.outputFile.get().asFile.invariantSeparatorsPath).endsWith("go/bin/main/gc")
     assertThat(compileGo.compilerArgs.get()).isEqualTo(emptyList<String>())
     assertThat(compileGo.source.isEmpty).isEqualTo(true)
   }
