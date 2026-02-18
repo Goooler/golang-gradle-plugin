@@ -15,8 +15,9 @@ public abstract class GoPlugin : Plugin<Project> {
           outputFileName.convention(
             buildMode.map { mode ->
               when (mode) {
-                GoBuildMode.EXE, GoBuildMode.PIE -> name
-                GoBuildMode.C_SHARED, GoBuildMode.SHARED, GoBuildMode.PLUGIN -> "lib$name.so"
+                GoBuildMode.C_SHARED,
+                GoBuildMode.SHARED,
+                GoBuildMode.PLUGIN -> "lib$name.so"
                 else -> name
               }
             }

@@ -61,6 +61,10 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
           minSdk = 24
         }
       }
+
+      go {
+        buildMode = io.github.goooler.golang.GoBuildMode.C_SHARED
+      }
       """
         .trimIndent()
     )
@@ -134,6 +138,10 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
             dimension = "version"
           }
         }
+      }
+
+      go {
+        buildMode = io.github.goooler.golang.GoBuildMode.C_SHARED
       }
       """
         .trimIndent()
