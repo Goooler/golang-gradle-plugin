@@ -13,7 +13,9 @@ public final class io/github/goooler/golang/GoBuildMode : java/lang/Enum {
 }
 
 public abstract interface class io/github/goooler/golang/GoExtension {
+	public abstract fun getBuildMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getExecutable ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 }

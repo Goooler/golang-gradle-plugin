@@ -48,9 +48,10 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
         val taskName = "compileGo${variant.name.capitalize()}${abi.normalized.capitalize()}"
         val task =
           tasks.register(taskName, GoCompile::class.java) { task ->
-            task.buildMode.convention(GoBuildMode.C_SHARED)
+            task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.C_SHARED))
             task.packageName.convention(goExtension.packageName)
             task.buildTags.convention(goExtension.buildTags)
+            task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
             task.environment.convention(
               ndkDirectory.map { ndkDir ->

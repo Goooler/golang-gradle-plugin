@@ -11,6 +11,7 @@ public abstract class GoPlugin : Plugin<Project> {
       val goExtension =
         extensions.create("go", GoExtension::class.java).apply {
           executable.convention(resolveGoExecutable(providers))
+          buildMode.convention(GoBuildMode.EXE)
         }
 
       // org.gradle.api.plugins.JavaBasePlugin
@@ -23,10 +24,11 @@ public abstract class GoPlugin : Plugin<Project> {
             }
 
           tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
-            task.buildMode.convention(GoBuildMode.EXE)
             task.source(goSourceDirectorySet)
+            task.buildMode.convention(goExtension.buildMode)
             task.packageName.convention(goExtension.packageName)
             task.buildTags.convention(goExtension.buildTags)
+            task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
             task.outputFile.convention(layout.buildDirectory.file("go/bin/${sourceSet.name}"))
           }
