@@ -9,7 +9,7 @@ public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
       val goExtension =
-        extensions.create("golang", GoExtension::class.java).apply {
+        extensions.create("go", GoExtension::class.java).apply {
           executable.convention(resolveGoExecutable(providers))
         }
 
