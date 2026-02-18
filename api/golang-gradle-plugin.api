@@ -24,13 +24,6 @@ public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin 
 	public fun apply (Lorg/gradle/api/Project;)V
 }
 
-public abstract interface class io/github/goooler/golang/GoSourceSet {
-	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
-	public abstract fun getGo ()Lorg/gradle/api/file/SourceDirectorySet;
-	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
-	public abstract fun go (Lorg/gradle/api/Action;)V
-}
-
 public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/tasks/SourceTask {
 	public fun <init> (Lorg/gradle/process/ExecOperations;)V
 	public final fun compile ()V
