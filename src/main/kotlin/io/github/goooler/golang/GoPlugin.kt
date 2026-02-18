@@ -19,7 +19,6 @@ public abstract class GoPlugin : Plugin<Project> {
           val goSourceDirectorySet =
             objects.sourceDirectorySet("go", "${sourceSet.name} Go source").apply {
               srcDir("src/${sourceSet.name}/go")
-              filter.include("**/*.go")
             }
 
           tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
