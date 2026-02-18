@@ -30,11 +30,11 @@ public abstract class GoPlugin : Plugin<Project> {
             task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
             task.outputFileName.convention(goExtension.outputFileName.orElse(project.name))
-            val outputFile =
-              layout.buildDirectory.zip(task.outputFileName) { dir, fileName ->
-                dir.file("go/bin/${sourceSet.name}/$fileName")
+            task.outputFile.convention(
+              layout.buildDirectory.zip(task.outputFileName) { build, fileName ->
+                build.file("go/bin/${sourceSet.name}/$fileName")
               }
-            task.outputFile.convention(outputFile)
+            )
           }
         }
       }
