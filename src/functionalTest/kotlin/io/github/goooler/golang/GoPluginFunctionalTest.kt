@@ -78,7 +78,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           id("io.github.goooler.golang")
       }
 
-      golang {
+      go {
           packageName.set("example.com/myapp")
           buildTags.set(listOf("mytag"))
       }

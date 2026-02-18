@@ -9,41 +9,34 @@ public abstract class GoPlugin : Plugin<Project> {
   override fun apply(project: Project): Unit =
     with(project) {
       val goExtension =
-        extensions.create("golang", GoExtension::class.java).apply {
+        extensions.create("go", GoExtension::class.java).apply {
           executable.convention(resolveGoExecutable(providers))
+          buildMode.convention(GoBuildMode.EXE)
           outputFileName.convention("lib$name.so")
         }
 
       // org.gradle.api.plugins.JavaBasePlugin
       plugins.withId("org.gradle.java-base") {
         extensions.getByType(SourceSetContainer::class.java).configureEach { sourceSet ->
-          val goSourceSet =
-            sourceSet.extensions
-              .create(
-                GoSourceSet::class.java,
-                "go",
-                DefaultGoSourceSet::class.java,
-                sourceSet,
-                objects,
-              )
-              .apply {
-                go.srcDir("src/${sourceSet.name}/go")
-                packageName.convention(goExtension.packageName)
-                buildTags.convention(goExtension.buildTags)
-              }
+          val goSourceDirectorySet =
+            objects.sourceDirectorySet("go", "${sourceSet.name} Go source").apply {
+              srcDir("src/${sourceSet.name}/go")
+              filter.include("**/*.go")
+            }
 
-          tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) {
-            it.buildMode.convention(GoBuildMode.EXE)
-            it.source(goSourceSet.go)
-            it.packageName.convention(goSourceSet.packageName)
-            it.buildTags.convention(goSourceSet.buildTags)
-            it.executable.convention(goExtension.executable)
-            it.outputFileName.convention(goExtension.outputFileName)
+          tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
+            task.source(goSourceDirectorySet)
+            task.buildMode.convention(goExtension.buildMode)
+            task.packageName.convention(goExtension.packageName)
+            task.buildTags.convention(goExtension.buildTags)
+            task.compilerArgs.convention(goExtension.compilerArgs)
+            task.executable.convention(goExtension.executable)
+            task.outputFileName.convention(goExtension.outputFileName)
             val outputFile =
-              layout.buildDirectory.zip(it.outputFileName) { dir, fileName ->
+              layout.buildDirectory.zip(task.outputFileName) { dir, fileName ->
                 dir.file("go/bin/${sourceSet.name}/$fileName")
               }
-            it.outputFile.convention(outputFile)
+            task.outputFile.convention(outputFile)
           }
         }
       }
