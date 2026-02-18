@@ -12,7 +12,15 @@ public abstract class GoPlugin : Plugin<Project> {
         extensions.create("go", GoExtension::class.java).apply {
           executable.convention(resolveGoExecutable(providers))
           buildMode.convention(GoBuildMode.EXE)
-          outputFileName.convention("lib$name.so")
+          outputFileName.convention(
+            buildMode.map { mode ->
+              when (mode) {
+                GoBuildMode.EXE, GoBuildMode.PIE -> name
+                GoBuildMode.C_SHARED, GoBuildMode.SHARED, GoBuildMode.PLUGIN -> "lib$name.so"
+                else -> name
+              }
+            }
+          )
         }
 
       // org.gradle.api.plugins.JavaBasePlugin
