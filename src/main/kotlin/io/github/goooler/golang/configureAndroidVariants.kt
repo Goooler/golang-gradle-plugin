@@ -74,7 +74,12 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 sources.static.map { dirs ->
                   dirs.map { dir ->
                     val goDir = dir.asFile.resolveSibling("go")
-                    if (goDir.exists()) goDir else dir.asFile.resolveSibling("golang")
+                    val golangDir = dir.asFile.resolveSibling("golang")
+                    when {
+                      goDir.exists() -> goDir
+                      golangDir.exists() -> golangDir
+                      else -> goDir
+                    }
                   }
                 }
               val goSourceSet = variant.sources.getByName("go")

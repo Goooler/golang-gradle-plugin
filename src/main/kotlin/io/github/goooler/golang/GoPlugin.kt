@@ -21,8 +21,12 @@ public abstract class GoPlugin : Plugin<Project> {
               srcDir(
                 provider {
                   val goDir = layout.projectDirectory.dir("src/${sourceSet.name}/go").asFile
-                  if (goDir.exists()) goDir
-                  else layout.projectDirectory.dir("src/${sourceSet.name}/golang").asFile
+                  val golangDir = layout.projectDirectory.dir("src/${sourceSet.name}/golang").asFile
+                  when {
+                    goDir.exists() -> goDir
+                    golangDir.exists() -> golangDir
+                    else -> goDir
+                  }
                 }
               )
               filter.include("**/*.go")
