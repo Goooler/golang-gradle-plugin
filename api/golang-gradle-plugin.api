@@ -29,8 +29,10 @@ public abstract class io/github/goooler/golang/GoPlugin : org/gradle/api/Plugin 
 }
 
 public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/tasks/SourceTask {
+	public static final field Companion Lio/github/goooler/golang/tasks/GoCompile$Companion;
 	public fun <init> (Lorg/gradle/process/ExecOperations;)V
 	public final fun compile ()V
+	public static final fun getBaseOutputDir (Lorg/gradle/api/Project;)Lorg/gradle/api/provider/Provider;
 	public abstract fun getBuildMode ()Lorg/gradle/api/provider/Property;
 	public abstract fun getBuildTags ()Lorg/gradle/api/provider/ListProperty;
 	public abstract fun getCompilerArgs ()Lorg/gradle/api/provider/ListProperty;
@@ -40,5 +42,9 @@ public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/
 	public abstract fun getOutputFileName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getWorkingDir ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public final class io/github/goooler/golang/tasks/GoCompile$Companion {
+	public final fun getBaseOutputDir (Lorg/gradle/api/Project;)Lorg/gradle/api/provider/Provider;
 }
 
