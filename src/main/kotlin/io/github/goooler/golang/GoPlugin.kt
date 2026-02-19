@@ -24,6 +24,11 @@ public abstract class GoPlugin : Plugin<Project> {
 
           tasks.register(sourceSet.getTaskName("compile", "Go"), GoCompile::class.java) { task ->
             task.source(goSourceDirectorySet)
+            task.workingDir.convention(
+              goExtension.workingDir.orElse(
+                layout.projectDirectory.dir(provider { goSourceDirectorySet.srcDirs.first().path })
+              )
+            )
             task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.EXE))
             task.packageName.convention(goExtension.packageName)
             task.buildTags.convention(goExtension.buildTags)
