@@ -170,6 +170,41 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake tasks depend on go compile tasks`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-deps-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go"
+        compileSdk = 35
+        defaultConfig {
+          minSdk = 24
+        }
+      }
+
+      // Simulate CMake tasks that AGP would normally create for each ABI
+      tasks.register("buildCMakeDebug[armeabi-v7a]")
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("--dry-run", "buildCMakeDebug[armeabi-v7a]")
+
+    assertThat(result.output).contains(":compileGoDebugArm32 SKIPPED")
+    assertThat(result.output).contains(":buildCMakeDebug[armeabi-v7a] SKIPPED")
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """
