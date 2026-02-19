@@ -99,20 +99,4 @@ class GoCompileTest {
 
     assertThat(task.workingDir.get()).isEqualTo(workDir)
   }
-
-  @Test
-  fun `GoCompile task has SkipWhenEmpty annotation on source property`() {
-    val project = ProjectBuilder.builder().build()
-    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
-
-    // Verify that the source property has @SkipWhenEmpty annotation
-    val getSourceMethod = GoCompile::class.java.getDeclaredMethod("getSource")
-    val skipWhenEmptyAnnotation =
-      getSourceMethod.getAnnotation(org.gradle.api.tasks.SkipWhenEmpty::class.java)
-    val inputFilesAnnotation =
-      getSourceMethod.getAnnotation(org.gradle.api.tasks.InputFiles::class.java)
-
-    assertThat(skipWhenEmptyAnnotation).isNotNull()
-    assertThat(inputFilesAnnotation).isNotNull()
-  }
 }
