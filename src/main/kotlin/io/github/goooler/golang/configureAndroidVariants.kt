@@ -53,6 +53,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             task.buildTags.convention(goExtension.buildTags)
             task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
+            task.workingDir.convention(goExtension.workingDir)
             task.environment.convention(
               ndkDirectory.map { ndkDir ->
                 mapOf(
@@ -69,14 +70,17 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               val goSourceDirs =
                 sources.static.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } }
               val goSourceSet = variant.sources.getByName("go")
-              goSourceDirs.get().forEach { goSourceSet.addStaticSourceDirectory(it.absolutePath) }
-              task.source(goSourceDirs)
-              goSourceDirs.get().firstOrNull()?.let { first ->
-                if (!first.exists()) return@let
-                task.workingDir.convention(
-                  goExtension.workingDir.orElse(layout.projectDirectory.dir(first.absolutePath))
-                )
+              var workingDirAdded = false
+              goSourceDirs.get().forEach {
+                goSourceSet.addStaticSourceDirectory(it.absolutePath)
+                if (!workingDirAdded && it.exists()) {
+                  task.workingDir.convention(
+                    goExtension.workingDir.orElse(layout.projectDirectory.dir(it.absolutePath))
+                  )
+                  workingDirAdded = true
+                }
               }
+              task.source(goSourceDirs)
             }
 
             task.outputFileName.convention(

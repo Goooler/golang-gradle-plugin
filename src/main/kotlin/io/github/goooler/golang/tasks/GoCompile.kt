@@ -31,7 +31,6 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:Input public abstract val outputFileName: Property<String>
   @get:InputDirectory
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  @get:Optional
   public abstract val workingDir: DirectoryProperty
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 
@@ -44,7 +43,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
       .exec { spec ->
         spec.environment(environment.get())
         spec.executable(executable.get())
-        workingDir.orNull?.let { spec.workingDir(it.asFile) }
+        spec.workingDir(workingDir.get())
         val args = mutableListOf("build", "-buildmode=${buildMode.get().mode}")
         if (tags.isNotEmpty()) {
           args.add("-tags")
