@@ -71,12 +71,11 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               val goSourceSet = variant.sources.getByName("go")
               goSourceDirs.get().forEach { goSourceSet.addStaticSourceDirectory(it.absolutePath) }
               task.source(goSourceDirs)
-              goSourceDirs.get().firstOrNull()?.let { first ->
-                if (!first.exists()) return@let
-                task.workingDir.convention(
-                  goExtension.workingDir.orElse(layout.projectDirectory.dir(first.absolutePath))
+              task.workingDir.convention(
+                goExtension.workingDir.orElse(
+                  layout.projectDirectory.dir(provider { goSourceDirs.get().first().absolutePath })
                 )
-              }
+              )
             }
 
             task.outputFileName.convention(
