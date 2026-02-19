@@ -105,6 +105,71 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `can run android task with golang source dir`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-android-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go"
+        compileSdk = 35
+        defaultConfig {
+          minSdk = 24
+        }
+      }
+      """
+        .trimIndent()
+    )
+
+    // Create a dummy go file in the golang directory
+    val goFile = projectRoot.resolve("src/main/golang/main.go")
+    goFile.createParentDirectories()
+    goFile.writeText(
+      """
+      package main
+
+      import "C"
+
+      func main() {}
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("assembleDebug")
+
+    assertThat(result.output).contains("BUILD SUCCESSFUL")
+
+    AndroidArch.values.forEach { abi ->
+      val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
+      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so"))
+        .exists()
+
+      val mergedLibFile =
+        projectRoot.resolve("build/generated/jniLibs/mergeGoJniLibsDebug/$abi/${libFile.name}")
+      assertThat(mergedLibFile).exists()
+    }
+
+    val aarFile = projectRoot.resolve("build/outputs/aar/go-android-test-debug.aar")
+    assertThat(aarFile).exists()
+
+    JarFile(aarFile.toFile()).use { jar ->
+      AndroidArch.values.forEach { abi ->
+        val entry = jar.getJarEntry("jni/$abi/libgo-android-test.so")
+        assertThat(entry).all { isNotNull() }
+      }
+    }
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """

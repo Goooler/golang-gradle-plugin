@@ -39,7 +39,10 @@ internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Local
 
 internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
   val androidComponents =
-    extensions.getByType(AndroidComponentsExtension::class.java).apply { registerSourceType("go") }
+    extensions.getByType(AndroidComponentsExtension::class.java).apply {
+      registerSourceType("go")
+      registerSourceType("golang")
+    }
   val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
 
   androidComponents.onVariants { variant ->
@@ -68,14 +71,31 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
             (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
               val goSourceDirs =
-                sources.static.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } }
+                sources.static.map { dirs ->
+                  dirs.map { dir ->
+                    val goDir = dir.asFile.resolveSibling("go")
+                    val golangDir = dir.asFile.resolveSibling("golang")
+                    when {
+                      goDir.exists() -> goDir
+                      golangDir.exists() -> golangDir
+                      else -> goDir
+                    }
+                  }
+                }
               val goSourceSet = variant.sources.getByName("go")
+              val golangSourceSet = variant.sources.getByName("golang")
               var workingDirAdded = false
-              goSourceDirs.get().forEach {
-                goSourceSet.addStaticSourceDirectory(it.absolutePath)
-                if (!workingDirAdded && it.exists()) {
+              goSourceDirs.get().forEach { selectedDir ->
+                if (selectedDir.name == "golang") {
+                  golangSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
+                } else {
+                  goSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
+                }
+                if (!workingDirAdded && selectedDir.exists()) {
                   task.workingDir.convention(
-                    goExtension.workingDir.orElse(layout.projectDirectory.dir(it.absolutePath))
+                    goExtension.workingDir.orElse(
+                      layout.projectDirectory.dir(selectedDir.absolutePath)
+                    )
                   )
                   workingDirAdded = true
                 }
