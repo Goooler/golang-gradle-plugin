@@ -2,6 +2,7 @@ package io.github.goooler.golang
 
 import com.android.build.api.variant.AndroidComponentsExtension
 import io.github.goooler.golang.tasks.GoCompile
+import io.github.goooler.golang.tasks.GoCompile.Companion.baseOutputDir
 import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
 import java.util.Locale
@@ -123,8 +124,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               goExtension.outputFileName.orElse("lib${project.name}.so")
             )
             task.outputFile.convention(
-              layout.buildDirectory.zip(task.outputFileName) { build, fileName ->
-                build.file("intermediates/go/${variant.name}/${abi.abi}/$fileName")
+              baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                base.file("${variant.name}/${abi.abi}/$fileName")
               }
             )
           }

@@ -2,11 +2,14 @@ package io.github.goooler.golang.tasks
 
 import io.github.goooler.golang.GoBuildMode
 import javax.inject.Inject
+import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -60,5 +63,11 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
         spec.args(args)
       }
       .assertNormalExitValue()
+  }
+
+  public companion object {
+    @JvmStatic
+    public val Project.baseOutputDir: Provider<Directory>
+      get() = layout.buildDirectory.dir("intermediates/go")
   }
 }
