@@ -18,8 +18,13 @@ public abstract class GoPlugin : Plugin<Project> {
         extensions.getByType(SourceSetContainer::class.java).configureEach { sourceSet ->
           val goSourceDirectorySet =
             objects.sourceDirectorySet("go", "${sourceSet.name} Go source").apply {
-              srcDir("src/${sourceSet.name}/go")
-              srcDir("src/${sourceSet.name}/golang")
+              srcDir(
+                provider {
+                  val goDir = layout.projectDirectory.dir("src/${sourceSet.name}/go").asFile
+                  if (goDir.exists()) goDir
+                  else layout.projectDirectory.dir("src/${sourceSet.name}/golang").asFile
+                }
+              )
               filter.include("**/*.go")
             }
 
@@ -27,12 +32,7 @@ public abstract class GoPlugin : Plugin<Project> {
             task.source(goSourceDirectorySet)
             task.workingDir.convention(
               goExtension.workingDir.orElse(
-                layout.projectDirectory.dir(
-                  provider {
-                    goSourceDirectorySet.srcDirs.firstOrNull { it.exists() }?.path
-                      ?: goSourceDirectorySet.srcDirs.first().path
-                  }
-                )
+                layout.projectDirectory.dir(provider { goSourceDirectorySet.srcDirs.first().path })
               )
             )
             task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.EXE))

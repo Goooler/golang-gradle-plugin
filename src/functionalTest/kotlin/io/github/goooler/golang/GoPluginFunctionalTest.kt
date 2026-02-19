@@ -64,34 +64,6 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
-  fun `can run task with both go and golang source dirs`() {
-    settingsFile.writeText("")
-    buildFile.writeText(
-      """
-      plugins {
-          id("java")
-          id("io.github.goooler.golang")
-      }
-      """
-        .trimIndent()
-    )
-
-    // Create go files in both directories
-    val goFile = projectRoot.resolve("src/main/go/main.go")
-    goFile.createParentDirectories()
-    goFile.writeText("package main\nfunc main() {}")
-    val golangFile = projectRoot.resolve("src/main/golang/util.go")
-    golangFile.createParentDirectories()
-    golangFile.writeText("package main\nfunc util() {}")
-
-    val result = runWithSuccess("compileGo")
-
-    assertThat(result.output).contains("BUILD SUCCESSFUL")
-    val task = result.task(":compileGo")
-    assertThat(task).isNotNull()
-  }
-
-  @Test
   fun `can configure output file`() {
     settingsFile.writeText("")
     buildFile.writeText(

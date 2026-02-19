@@ -72,22 +72,23 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
               val goSourceDirs =
                 sources.static.map { dirs ->
-                  dirs.flatMap {
-                    listOf(it.asFile.resolveSibling("go"), it.asFile.resolveSibling("golang"))
+                  dirs.map { dir ->
+                    val goDir = dir.asFile.resolveSibling("go")
+                    if (goDir.exists()) goDir else dir.asFile.resolveSibling("golang")
                   }
                 }
               val goSourceSet = variant.sources.getByName("go")
               val golangSourceSet = variant.sources.getByName("golang")
               var workingDirAdded = false
-              goSourceDirs.get().forEach {
-                if (it.name == "golang") {
-                  golangSourceSet.addStaticSourceDirectory(it.absolutePath)
+              goSourceDirs.get().forEach { selectedDir ->
+                if (selectedDir.name == "golang") {
+                  golangSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
                 } else {
-                  goSourceSet.addStaticSourceDirectory(it.absolutePath)
+                  goSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
                 }
-                if (!workingDirAdded && it.exists()) {
+                if (!workingDirAdded && selectedDir.exists()) {
                   task.workingDir.convention(
-                    goExtension.workingDir.orElse(layout.projectDirectory.dir(it.absolutePath))
+                    goExtension.workingDir.orElse(layout.projectDirectory.dir(selectedDir.absolutePath))
                   )
                   workingDirAdded = true
                 }
