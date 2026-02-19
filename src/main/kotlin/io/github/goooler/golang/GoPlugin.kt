@@ -19,6 +19,7 @@ public abstract class GoPlugin : Plugin<Project> {
           val goSourceDirectorySet =
             objects.sourceDirectorySet("go", "${sourceSet.name} Go source").apply {
               srcDir("src/${sourceSet.name}/go")
+              srcDir("src/${sourceSet.name}/golang")
               filter.include("**/*.go")
             }
 
@@ -26,7 +27,12 @@ public abstract class GoPlugin : Plugin<Project> {
             task.source(goSourceDirectorySet)
             task.workingDir.convention(
               goExtension.workingDir.orElse(
-                layout.projectDirectory.dir(provider { goSourceDirectorySet.srcDirs.first().path })
+                layout.projectDirectory.dir(
+                  provider {
+                    goSourceDirectorySet.srcDirs.firstOrNull { it.exists() }?.path
+                      ?: goSourceDirectorySet.srcDirs.first().path
+                  }
+                )
               )
             )
             task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.EXE))

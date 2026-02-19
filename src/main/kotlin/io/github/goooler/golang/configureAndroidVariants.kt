@@ -39,7 +39,10 @@ internal fun String.capitalize(): String = replaceFirstChar { it.titlecase(Local
 
 internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
   val androidComponents =
-    extensions.getByType(AndroidComponentsExtension::class.java).apply { registerSourceType("go") }
+    extensions.getByType(AndroidComponentsExtension::class.java).apply {
+      registerSourceType("go")
+      registerSourceType("golang")
+    }
   val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
 
   androidComponents.onVariants { variant ->
@@ -68,11 +71,20 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
             (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
               val goSourceDirs =
-                sources.static.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } }
+                sources.static.map { dirs ->
+                  dirs.flatMap {
+                    listOf(it.asFile.resolveSibling("go"), it.asFile.resolveSibling("golang"))
+                  }
+                }
               val goSourceSet = variant.sources.getByName("go")
+              val golangSourceSet = variant.sources.getByName("golang")
               var workingDirAdded = false
               goSourceDirs.get().forEach {
-                goSourceSet.addStaticSourceDirectory(it.absolutePath)
+                if (it.name == "golang") {
+                  golangSourceSet.addStaticSourceDirectory(it.absolutePath)
+                } else {
+                  goSourceSet.addStaticSourceDirectory(it.absolutePath)
+                }
                 if (!workingDirAdded && it.exists()) {
                   task.workingDir.convention(
                     goExtension.workingDir.orElse(layout.projectDirectory.dir(it.absolutePath))
