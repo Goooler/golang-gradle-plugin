@@ -43,7 +43,11 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
       .exec { spec ->
         spec.environment(environment.get())
         spec.executable(executable.get())
-        workingDir.orNull?.let { spec.workingDir(it.asFile) }
+        workingDir.orNull?.let {
+          if (it.asFile.exists()) {
+            spec.workingDir(it.asFile)
+          }
+        }
         val args = mutableListOf("build", "-buildmode=${buildMode.get().mode}")
         if (tags.isNotEmpty()) {
           args.add("-tags")
