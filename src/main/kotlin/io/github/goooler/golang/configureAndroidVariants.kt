@@ -88,7 +88,9 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 }
                 if (!workingDirAdded && selectedDir.exists()) {
                   task.workingDir.convention(
-                    goExtension.workingDir.orElse(layout.projectDirectory.dir(selectedDir.absolutePath))
+                    goExtension.workingDir.orElse(
+                      layout.projectDirectory.dir(selectedDir.absolutePath)
+                    )
                   )
                   workingDirAdded = true
                 }
