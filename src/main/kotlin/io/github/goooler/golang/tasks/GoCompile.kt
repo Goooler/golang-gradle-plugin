@@ -7,6 +7,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
@@ -16,9 +17,8 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import org.gradle.work.DisableCachingByDefault
 
-@DisableCachingByDefault(because = "Go build is not cacheable yet")
+@CacheableTask
 public abstract class GoCompile @Inject constructor(private val execOperations: ExecOperations) :
   SourceTask() {
 
