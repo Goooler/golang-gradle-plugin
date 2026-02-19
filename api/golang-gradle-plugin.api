@@ -39,7 +39,6 @@ public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/
 	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getOutputFileName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
-	public fun getSource ()Lorg/gradle/api/file/FileTree;
 	public abstract fun getWorkingDir ()Lorg/gradle/api/file/DirectoryProperty;
 }
 
