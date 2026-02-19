@@ -64,6 +64,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `can configure output file`() {
     settingsFile.writeText("")
     buildFile.writeText(
       """
