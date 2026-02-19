@@ -12,8 +12,8 @@ import assertk.assertions.isExecutable
 import assertk.assertions.key
 import com.android.build.api.dsl.LibraryExtension
 import io.github.goooler.golang.GoBuildMode
+import io.github.goooler.golang.GoExtension
 import io.github.goooler.golang.GoPlugin
-import java.nio.file.Path
 import kotlin.io.path.Path
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -62,6 +62,10 @@ class GoCompileTest {
     android.namespace = "com.example.go"
     android.defaultConfig { minSdk = 24 }
 
+    project.extensions.configure(GoExtension::class.java) {
+      it.workingDir.set(project.layout.projectDirectory.dir("ext-work"))
+    }
+
     project.afterEvaluate {
       val taskName = "compileGoDebugArm64"
       val task = project.tasks.named(taskName, GoCompile::class.java).get()
@@ -80,6 +84,18 @@ class GoCompileTest {
             isExecutable()
           }
       }
+      assertThat(task.workingDir.get().asFile).isEqualTo(project.projectDir.resolve("ext-work"))
     }
+  }
+
+  @Test
+  fun `workingDir can be set manually on GoCompile task`() {
+    val project = ProjectBuilder.builder().build()
+    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
+    val workDir = project.layout.projectDirectory.dir("custom-work")
+
+    task.workingDir.set(workDir)
+
+    assertThat(task.workingDir.get()).isEqualTo(workDir)
   }
 }
