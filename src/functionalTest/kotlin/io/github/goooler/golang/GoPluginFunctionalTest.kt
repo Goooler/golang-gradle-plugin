@@ -4,9 +4,11 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
+import org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
 import org.junit.jupiter.api.Test
 
 class GoPluginFunctionalTest : BaseFunctionalTest() {
@@ -123,9 +125,6 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     // Don't create any .go files - leave the source directory empty
     val result = runWithSuccess("compileGo")
 
-    assertThat(result.output).all {
-      contains("BUILD SUCCESSFUL")
-      contains("NO-SOURCE")
-    }
+    assertThat(result.task(":compileGo")).isNotNull().transform { it.outcome }.isEqualTo(NO_SOURCE)
   }
 }

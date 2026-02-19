@@ -40,9 +40,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @InputFiles
   @SkipWhenEmpty
   @PathSensitive(PathSensitivity.RELATIVE)
-  override fun getSource(): FileTree {
-    return super.getSource()
-  }
+  override fun getSource(): FileTree = super.getSource()
 
   @TaskAction
   public fun compile() {
