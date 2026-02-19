@@ -29,7 +29,11 @@ public abstract class GoPlugin : Plugin<Project> {
             task.buildTags.convention(goExtension.buildTags)
             task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
-            task.workingDir.convention(goExtension.workingDir)
+            task.workingDir.convention(
+              goExtension.workingDir.orElse(
+                layout.projectDirectory.dir(provider { goSourceDirectorySet.srcDirs.first().path })
+              )
+            )
             task.outputFileName.convention(goExtension.outputFileName.orElse(project.name))
             task.outputFile.convention(
               layout.buildDirectory.zip(task.outputFileName) { build, fileName ->

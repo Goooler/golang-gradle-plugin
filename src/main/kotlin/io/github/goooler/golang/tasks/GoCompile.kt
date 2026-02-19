@@ -29,9 +29,8 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:Input public abstract val buildTags: ListProperty<String>
   @get:Input public abstract val executable: Property<String>
   @get:Input public abstract val outputFileName: Property<String>
-  @get:PathSensitive(PathSensitivity.RELATIVE)
   @get:InputDirectory
-  @get:Optional
+  @get:PathSensitive(PathSensitivity.RELATIVE)
   public abstract val workingDir: DirectoryProperty
   @get:OutputFile public abstract val outputFile: RegularFileProperty
 

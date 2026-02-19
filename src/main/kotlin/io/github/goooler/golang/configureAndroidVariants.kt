@@ -53,7 +53,17 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             task.buildTags.convention(goExtension.buildTags)
             task.compilerArgs.convention(goExtension.compilerArgs)
             task.executable.convention(goExtension.executable)
-            task.workingDir.convention(goExtension.workingDir)
+            val goSourceDirs =
+              (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
+                sources.static.map { dirs -> dirs.map { it.asFile.resolveSibling("go") } }
+              }
+            task.workingDir.convention(
+              goExtension.workingDir.orElse(
+                layout.projectDirectory.dir(
+                  provider { goSourceDirs?.get()?.first()?.absolutePath ?: projectDir.absolutePath }
+                )
+              )
+            )
             task.environment.convention(
               ndkDirectory.map { ndkDir ->
                 mapOf(
