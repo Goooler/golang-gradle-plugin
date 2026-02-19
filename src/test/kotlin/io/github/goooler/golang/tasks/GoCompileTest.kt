@@ -31,8 +31,7 @@ class GoCompileTest {
 
     assertThat(compileGo.buildMode.get()).isEqualTo(GoBuildMode.EXE)
     assertThat(compileGo.outputFile.get().asFile.invariantSeparatorsPath).endsWith("go/bin/main/gc")
-    assertThat(compileGo.workingDir.get().asFile.invariantSeparatorsPath)
-      .endsWith("src/main/go")
+    assertThat(compileGo.workingDir.get().asFile.invariantSeparatorsPath).endsWith("src/main/go")
     assertThat(compileGo.compilerArgs.get()).isEqualTo(emptyList<String>())
     assertThat(compileGo.source.isEmpty).isEqualTo(true)
   }
