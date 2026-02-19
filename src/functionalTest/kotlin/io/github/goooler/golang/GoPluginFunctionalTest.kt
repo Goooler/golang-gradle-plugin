@@ -106,4 +106,26 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     val task = result.task(":compileGo")
     assertThat(task).isNotNull()
   }
+
+  @Test
+  fun `task is skipped when no source files exist`() {
+    settingsFile.writeText("")
+    buildFile.writeText(
+      """
+      plugins {
+          id("java")
+          id("io.github.goooler.golang")
+      }
+      """
+        .trimIndent()
+    )
+
+    // Don't create any .go files - leave the source directory empty
+    val result = runWithSuccess("compileGo")
+
+    assertThat(result.output).all {
+      contains("BUILD SUCCESSFUL")
+      contains("NO-SOURCE")
+    }
+  }
 }
