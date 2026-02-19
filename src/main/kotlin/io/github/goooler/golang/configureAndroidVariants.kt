@@ -119,9 +119,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       compileTasks.associate { (abi, compileTask) ->
         "buildCMake${variant.name.capitalize()}[${abi.abi}]" to compileTask
       }
-    tasks.configureEach { task ->
-      cmakeTaskDeps[task.name]?.let { task.dependsOn(it) }
-    }
+    tasks.configureEach { task -> cmakeTaskDeps[task.name]?.let { task.dependsOn(it) } }
 
     val mergeTask =
       tasks.register(
