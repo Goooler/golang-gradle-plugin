@@ -240,6 +240,48 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake flavored release tasks depend on go compile tasks`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-flavored-release-deps-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.flavored"
+        compileSdk = 35
+        defaultConfig {
+          minSdk = 24
+        }
+
+        flavorDimensions += "version"
+        productFlavors {
+          create("demo") {
+            dimension = "version"
+          }
+        }
+      }
+
+      // Simulate CMake tasks that AGP would normally create for each ABI for demoRelease
+      tasks.register("buildCMakeDemoRelWithDebInfo[armeabi-v7a]")
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("--dry-run", "buildCMakeDemoRelWithDebInfo[armeabi-v7a]")
+
+    assertThat(result.output).contains(":compileGoDemoReleaseArm32 SKIPPED")
+    assertThat(result.output).contains(":buildCMakeDemoRelWithDebInfo[armeabi-v7a] SKIPPED")
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """
