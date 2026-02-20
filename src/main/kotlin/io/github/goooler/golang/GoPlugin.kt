@@ -1,6 +1,7 @@
 package io.github.goooler.golang
 
 import io.github.goooler.golang.tasks.GoCompile
+import io.github.goooler.golang.tasks.GoCompile.Companion.baseOutputDir
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -46,8 +47,8 @@ public abstract class GoPlugin : Plugin<Project> {
             task.executable.convention(goExtension.executable)
             task.outputFileName.convention(goExtension.outputFileName.orElse(project.name))
             task.outputFile.convention(
-              layout.buildDirectory.zip(task.outputFileName) { build, fileName ->
-                build.file("go/bin/${sourceSet.name}/$fileName")
+              baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                base.file("${sourceSet.name}/$fileName")
               }
             )
           }
