@@ -128,31 +128,27 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 base.file("${variant.name}/${abi.abi}/$fileName")
               }
             )
+            task.outputHeader.convention(
+              baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                val nameWithoutExt = fileName.substringBeforeLast('.')
+                base.file("${variant.name}/${abi.abi}/$nameWithoutExt.h")
+              }
+            )
           }
         abi to task
       }
 
-    val buildType = variant.buildType.orEmpty()
-    val cmakeBuildType =
-      when (buildType.lowercase(Locale.ROOT)) {
-        "release" -> "RelWithDebInfo"
-        else -> buildType.capitalize()
+    val abiToCompileTasks = compileTasks.associate { it.first.abi to it.second }
+    tasks.configureEach { task ->
+      val taskName = task.name
+      if (taskName.startsWith("buildCMake") || taskName.startsWith("configureCMake")) {
+        abiToCompileTasks.forEach { (abi, compileTask) ->
+          if (taskName.contains("[$abi]")) {
+            task.dependsOn(compileTask)
+          }
+        }
       }
-    val variantNameCapitalized = variant.name.capitalize()
-    val buildTypeCapitalized = buildType.capitalize()
-    val cmakeVariantName =
-      if (buildType.isNotEmpty() && variantNameCapitalized.endsWith(buildTypeCapitalized)) {
-        variantNameCapitalized.removeSuffix(buildTypeCapitalized) + cmakeBuildType
-      } else {
-        variantNameCapitalized
-      }
-    val cmakeTaskDeps =
-      compileTasks.associate { (abi, compileTask) ->
-        // `buildCMakeDebug[arm64-v8a]` for debug
-        // `buildCMakeRelWithDebInfo[arm64-v8a]` for release
-        "buildCMake$cmakeVariantName[${abi.abi}]" to compileTask
-      }
-    tasks.configureEach { task -> cmakeTaskDeps[task.name]?.let { task.dependsOn(it) } }
+    }
 
     val mergeTask =
       tasks.register(
