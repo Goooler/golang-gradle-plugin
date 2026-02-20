@@ -131,6 +131,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       }
     val cmakeTaskDeps =
       compileTasks.associate { (abi, compileTask) ->
+        // `buildCMakeDebug[arm64-v8a]` for debug and `buildCMakeRelWithDebInfo[arm64-v8a]` for release
         "buildCMake$cmakeVariantName[${abi.abi}]" to compileTask
       }
     tasks.configureEach { task -> cmakeTaskDeps[task.name]?.let { task.dependsOn(it) } }
