@@ -115,9 +115,25 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
         abi to task
       }
 
+    val buildType = variant.buildType.orEmpty()
+    val cmakeBuildType =
+      when (buildType.lowercase(Locale.ROOT)) {
+        "release" -> "RelWithDebInfo"
+        else -> buildType.capitalize()
+      }
+    val variantNameCapitalized = variant.name.capitalize()
+    val buildTypeCapitalized = buildType.capitalize()
+    val cmakeVariantName =
+      if (buildType.isNotEmpty() && variantNameCapitalized.endsWith(buildTypeCapitalized)) {
+        variantNameCapitalized.removeSuffix(buildTypeCapitalized) + cmakeBuildType
+      } else {
+        variantNameCapitalized
+      }
     val cmakeTaskDeps =
       compileTasks.associate { (abi, compileTask) ->
-        "buildCMake${variant.name.capitalize()}[${abi.abi}]" to compileTask
+        // `buildCMakeDebug[arm64-v8a]` for debug
+        // `buildCMakeRelWithDebInfo[arm64-v8a]` for release
+        "buildCMake$cmakeVariantName[${abi.abi}]" to compileTask
       }
     tasks.configureEach { task -> cmakeTaskDeps[task.name]?.let { task.dependsOn(it) } }
 
