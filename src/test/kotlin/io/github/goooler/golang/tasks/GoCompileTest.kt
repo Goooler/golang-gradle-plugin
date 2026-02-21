@@ -89,6 +89,64 @@ class GoCompileTest {
     }
   }
 
+  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
+  @Test
+  fun `GoCompile debug variant has no trimpath arg`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("com.android.library")
+    project.plugins.apply("io.github.goooler.golang")
+
+    val android = project.extensions.getByType(LibraryExtension::class.java)
+    android.compileSdk = 35
+    android.namespace = "com.example.go"
+    android.defaultConfig { minSdk = 24 }
+
+    project.afterEvaluate {
+      val task = project.tasks.named("compileGoDebugArm64", GoCompile::class.java).get()
+      assertThat(task.compilerArgs.get()).isEqualTo(emptyList<String>())
+    }
+  }
+
+  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
+  @Test
+  fun `GoCompile release variant has trimpath arg`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("com.android.library")
+    project.plugins.apply("io.github.goooler.golang")
+
+    val android = project.extensions.getByType(LibraryExtension::class.java)
+    android.compileSdk = 35
+    android.namespace = "com.example.go"
+    android.defaultConfig { minSdk = 24 }
+
+    project.afterEvaluate {
+      val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
+      assertThat(task.compilerArgs.get()).isEqualTo(listOf("-trimpath"))
+    }
+  }
+
+  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
+  @Test
+  fun `GoCompile release variant appends trimpath to user-provided args`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("com.android.library")
+    project.plugins.apply("io.github.goooler.golang")
+
+    val android = project.extensions.getByType(LibraryExtension::class.java)
+    android.compileSdk = 35
+    android.namespace = "com.example.go"
+    android.defaultConfig { minSdk = 24 }
+
+    project.extensions.configure(GoExtension::class.java) {
+      it.compilerArgs.add("-v")
+    }
+
+    project.afterEvaluate {
+      val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
+      assertThat(task.compilerArgs.get()).isEqualTo(listOf("-v", "-trimpath"))
+    }
+  }
+
   @Test
   fun `workingDir can be set manually on GoCompile task`() {
     val project = ProjectBuilder.builder().build()
