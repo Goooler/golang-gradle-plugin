@@ -57,7 +57,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             task.buildTags.convention(goExtension.buildTags)
             task.compilerArgs.convention(
               goExtension.compilerArgs.map { args ->
-                if (isRelease) args + listOf("-trimpath") else args
+                if (isRelease) args + listOf("-trimpath", "-ldflags", "-s -w") else args
               }
             )
             task.executable.convention(goExtension.executable)

@@ -109,7 +109,7 @@ class GoCompileTest {
 
   @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
-  fun `GoCompile release variant has trimpath arg`() {
+  fun `GoCompile release variant has release args`() {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("com.android.library")
     project.plugins.apply("io.github.goooler.golang")
@@ -121,13 +121,13 @@ class GoCompileTest {
 
     project.afterEvaluate {
       val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
-      assertThat(task.compilerArgs.get()).isEqualTo(listOf("-trimpath"))
+      assertThat(task.compilerArgs.get()).isEqualTo(listOf("-trimpath", "-ldflags", "-s -w"))
     }
   }
 
   @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
-  fun `GoCompile release variant appends trimpath to user-provided args`() {
+  fun `GoCompile release variant appends release args to user-provided args`() {
     val project = ProjectBuilder.builder().build()
     project.plugins.apply("com.android.library")
     project.plugins.apply("io.github.goooler.golang")
@@ -141,7 +141,7 @@ class GoCompileTest {
 
     project.afterEvaluate {
       val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
-      assertThat(task.compilerArgs.get()).isEqualTo(listOf("-v", "-trimpath"))
+      assertThat(task.compilerArgs.get()).isEqualTo(listOf("-v", "-trimpath", "-ldflags", "-s -w"))
     }
   }
 
