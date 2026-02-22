@@ -46,6 +46,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
   val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
 
   androidComponents.onVariants { variant ->
+    val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
     val compileTasks =
       AndroidArch.entries.map { abi ->
         val taskName = "compileGo${variant.name.capitalize()}${abi.normalized.capitalize()}"
@@ -54,7 +55,11 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.C_SHARED))
             task.packageName.convention(goExtension.packageName)
             task.buildTags.convention(goExtension.buildTags)
-            task.compilerArgs.convention(goExtension.compilerArgs)
+            task.compilerArgs.convention(
+              goExtension.compilerArgs.map { args ->
+                if (isRelease) args + listOf("-trimpath", "-ldflags", "-s -w") else args
+              }
+            )
             task.executable.convention(goExtension.executable)
             task.workingDir.convention(goExtension.workingDir)
             task.environment.convention(
