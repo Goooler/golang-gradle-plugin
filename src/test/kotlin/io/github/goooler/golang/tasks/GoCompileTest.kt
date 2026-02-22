@@ -137,9 +137,7 @@ class GoCompileTest {
     android.namespace = "com.example.go"
     android.defaultConfig { minSdk = 24 }
 
-    project.extensions.configure(GoExtension::class.java) {
-      it.compilerArgs.add("-v")
-    }
+    project.extensions.configure(GoExtension::class.java) { it.compilerArgs.add("-v") }
 
     project.afterEvaluate {
       val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
