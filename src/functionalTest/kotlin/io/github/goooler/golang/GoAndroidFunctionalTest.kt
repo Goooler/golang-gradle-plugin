@@ -7,9 +7,7 @@ import assertk.assertions.exists
 import assertk.assertions.isNotNull
 import java.util.Properties
 import java.util.jar.JarFile
-import kotlin.collections.firstOrNull
 import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
@@ -27,19 +25,18 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
   @BeforeEach
   fun setupLocalProperties() {
+    System.getenv("ANDROID_SDK_ROOT")
+      ?: System.getenv("ANDROID_HOME")
+      ?: error(
+        "SDK path not found. Please set ANDROID_SDK_ROOT or ANDROID_HOME environment variable."
+      )
+
     val ndkHome =
       System.getenv("ANDROID_NDK")
         ?: System.getenv("ANDROID_NDK_HOME")
-        ?: System.getenv("ANDROID_HOME")?.let {
-          val ndkDir = Path(it).resolve("ndk")
-          if (ndkDir.exists()) {
-            ndkDir.firstOrNull()?.absolutePathString()
-          } else {
-            null
-          }
-        }
+        ?: System.getenv("ANDROID_NDK_LATEST_HOME")
         ?: error(
-          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_HOME environment variable."
+          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_NDK_LATEST_HOME environment variable."
         )
 
     val properties = Properties().apply { setProperty("ndk.dir", ndkHome) }
