@@ -3,15 +3,10 @@ package io.github.goooler.golang
 import assertk.assertThat
 import assertk.assertions.doesNotContain
 import java.nio.file.Path
-import java.util.Properties
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
 
@@ -20,33 +15,6 @@ abstract class BaseFunctionalTest {
   @TempDir
   lateinit var projectRoot: Path
     private set
-
-  lateinit var ndkVersion: String
-    private set
-
-  @BeforeEach
-  fun setupLocalProperties() {
-    val ndkHome =
-      System.getenv("ANDROID_NDK")
-        ?: System.getenv("ANDROID_NDK_HOME")
-        ?: System.getProperty("ANDROID_HOME")?.let {
-          Path(it).resolve("ndk").firstOrNull()?.absolutePathString()
-        }
-        ?: error(
-          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_HOME environment variable."
-        )
-
-    val properties = Properties().apply { setProperty("ndk.dir", ndkHome) }
-    projectRoot.resolve("local.properties").outputStream().use { properties.store(it, null) }
-
-    val propsFile = Path(ndkHome).resolve("source.properties")
-    if (propsFile.exists()) {
-      val props = Properties().apply { load(propsFile.inputStream()) }
-      ndkVersion = props.getProperty("Pkg.Revision")
-    } else {
-      error("source.properties not found in NDK directory: $ndkHome")
-    }
-  }
 
   val buildFile: Path
     get() = projectRoot.resolve("build.gradle.kts")
