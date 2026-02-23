@@ -12,9 +12,7 @@ import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
-@EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
 class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
   @BeforeEach

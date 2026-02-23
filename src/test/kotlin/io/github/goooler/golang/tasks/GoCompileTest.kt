@@ -18,7 +18,6 @@ import kotlin.io.path.Path
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
 class GoCompileTest {
   @Test
@@ -51,7 +50,6 @@ class GoCompileTest {
     assertThat(task.environment.get()).contains("GOOS", "linux")
   }
 
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
   fun `GoCompile properties for Android variants are configured correctly`() {
     val project = ProjectBuilder.builder().build()
@@ -89,7 +87,6 @@ class GoCompileTest {
     }
   }
 
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
   fun `GoCompile debug variant has no trimpath arg`() {
     val project = ProjectBuilder.builder().build()
@@ -107,7 +104,6 @@ class GoCompileTest {
     }
   }
 
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
   fun `GoCompile release variant has release args`() {
     val project = ProjectBuilder.builder().build()
@@ -125,7 +121,6 @@ class GoCompileTest {
     }
   }
 
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
   fun `GoCompile release variant appends release args to user-provided args`() {
     val project = ProjectBuilder.builder().build()
