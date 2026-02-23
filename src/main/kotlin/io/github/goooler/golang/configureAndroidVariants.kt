@@ -5,6 +5,7 @@ import io.github.goooler.golang.tasks.GoCompile
 import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
 import java.util.Locale
+import java.util.Properties
 import org.gradle.api.Project
 
 internal enum class AndroidArch(val abi: String, val normalized: String) {
@@ -57,9 +58,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 .fileContents(rootProject.layout.projectDirectory.file("local.properties"))
                 .asText
                 .map { content ->
-                  java.util.Properties()
-                    .apply { load(content.reader()) }
-                    .getProperty("ndk.dir")
+                  Properties().apply { load(content.reader()) }.getProperty("ndk.dir").trim()
                 }
             )
             .map { File(it) }

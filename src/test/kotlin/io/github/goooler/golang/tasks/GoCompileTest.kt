@@ -149,17 +149,17 @@ class GoCompileTest {
 
   @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
-  fun `GoCompile environment reads ndk dir from local properties`(
-    @TempDir tempDir: File,
-  ) {
-    val ndkDir = System.getenv("ANDROID_NDK")
-      ?: System.getenv("ANDROID_NDK_HOME")
-      ?: System.getenv("ANDROID_NDK_LATEST_HOME")
-      ?: run {
-        // Discover the NDK from the Android SDK if no env var is set
-        val androidHome = System.getenv("ANDROID_HOME")
-        File(androidHome, "ndk").listFiles()?.sortedDescending()?.firstOrNull()?.absolutePath
-      } ?: return // skip if no NDK found at all
+  fun `GoCompile environment reads ndk dir from local properties`(@TempDir tempDir: File) {
+    val ndkDir =
+      System.getenv("ANDROID_NDK")
+        ?: System.getenv("ANDROID_NDK_HOME")
+        ?: System.getenv("ANDROID_NDK_LATEST_HOME")
+        ?: run {
+          // Discover the NDK from the Android SDK if no env var is set
+          val androidHome = System.getenv("ANDROID_HOME")
+          File(androidHome, "ndk").listFiles()?.sortedDescending()?.firstOrNull()?.absolutePath
+        }
+        ?: return // skip if no NDK found at all
 
     val localProperties = File(tempDir, "local.properties")
     localProperties.writeText("ndk.dir=$ndkDir\n")
