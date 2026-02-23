@@ -155,7 +155,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
-    configureCMakeTasks(variant.name, compileTasks)
+    configureCMakeTasks(variant.name, variant.buildType.orEmpty(), compileTasks)
   }
 }
 
@@ -166,6 +166,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
  */
 private fun Project.configureCMakeTasks(
   variantName: String,
+  buildType: String,
   compileTasks: Map<String, TaskProvider<GoCompile>>,
 ) {
   tasks
@@ -183,7 +184,16 @@ private fun Project.configureCMakeTasks(
         val normalizedSegment =
           cmakeVariantSegment.replace("RelWithDebInfo", "Release").replace("MinSizeRel", "Release")
 
-        if (normalizedSegment == variantName.capitalize()) {
+        // Match by full variant name (e.g. "MetaRelease") OR by build type alone (e.g.
+        // "Release"). The latter handles the case where AGP omits the flavor from the CMake
+        // task name and uses numeric suffixes instead (e.g.
+        // "buildCMakeRelWithDebInfo[arm64-v8a]-2" for a second flavored release variant).
+        // In that case we cannot tell which specific variant the task belongs to, so we wire
+        // dependencies from every variant that shares the same build type. The extra
+        // dependencies are harmless: Go compile tasks for other flavors will either be skipped
+        // (no sources) or produce output in a different directory that CMake ignores.
+        if (normalizedSegment == variantName.capitalize() ||
+            normalizedSegment == buildType.capitalize()) {
           cmake.dependsOn(goCompile)
           logger.info("Hooked: {} now depends on {}", cmake.name, goCompile.name)
         }

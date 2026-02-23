@@ -384,6 +384,65 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake release tasks without flavor prefix depend on all matching go compile tasks`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-unflavored-release-deps-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.unflavored"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+
+        flavorDimensions += "feature"
+        productFlavors {
+          create("alpha") {
+            dimension = "feature"
+          }
+          create("meta") {
+            dimension = "feature"
+            isDefault = true
+          }
+        }
+      }
+
+      // Simulate the AGP behavior where multiple flavored release variants produce CMake tasks
+      // without the flavor prefix, disambiguated by a numeric suffix. This matches the real-world
+      // failure where buildCMakeRelWithDebInfo[arm64-v8a]-2 was not wired to its Go compile task.
+      tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]")
+      tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]-2")
+      """
+        .trimIndent()
+    )
+
+    // Both unflavored CMake tasks should depend on Go compile tasks for all release variants,
+    // because without the flavor in the task name we cannot determine which specific variant
+    // owns the task. Extra dependencies on other flavors' compile tasks are harmless: those
+    // tasks either skip (no sources) or write to a different output directory that CMake ignores.
+    val result1 = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]")
+    assertThat(result1.output).contains(":compileGoAlphaReleaseArm32 SKIPPED")
+    assertThat(result1.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
+    assertThat(result1.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a] SKIPPED")
+
+    val result2 = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]-2")
+    assertThat(result2.output).contains(":compileGoAlphaReleaseArm32 SKIPPED")
+    assertThat(result2.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
+    assertThat(result2.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a]-2 SKIPPED")
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """
