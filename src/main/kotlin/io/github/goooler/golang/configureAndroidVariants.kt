@@ -49,9 +49,9 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
         .directoryProperty()
         .fileProvider(
           providers
-            .environmentVariable("ANDROID_NDK_LATEST_HOME")
+            .environmentVariable("ANDROID_NDK")
             .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
-            .orElse(providers.environmentVariable("ANDROID_NDK"))
+            .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
             .map { File(it) }
         )
     )
