@@ -7,6 +7,7 @@ import io.github.goooler.golang.tasks.MergeGoJniLibsTask
 import java.io.File
 import java.util.Locale
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 
 internal enum class AndroidArch(val abi: String, val normalized: String) {
   ARM64_V8A("arm64-v8a", "arm64"),
@@ -154,22 +155,30 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
-    tasks
-      .named { it.startsWith("buildCMake") }
-      .configureEach { ccm ->
-        compileTasks.forEach { (abi, task) ->
-          when {
-            // `buildCMakeDebug[arm64-v8a]` for debug
-            ccm.name.contains("Debug") && ccm.name.contains(abi) && task.name.contains("Debug") ->
-              ccm.dependsOn(task)
-            // `buildCMakeRelWithDebInfo[arm64-v8a]` for release
-            ccm.name.contains("RelWithDebInfo") &&
-              ccm.name.contains(abi) &&
-              task.name.contains("Release") -> ccm.dependsOn(task)
-          }
+    configureBuildCMakeTasks(compileTasks)
+  }
+}
+
+/**
+ * There is no official way to add task dependencies to CMake build tasks, so we have to rely on the
+ * task name pattern.
+ */
+private fun Project.configureBuildCMakeTasks(compileTasks: Map<String, TaskProvider<GoCompile>>) {
+  tasks
+    .named { it.startsWith("buildCMake") }
+    .configureEach { ccm ->
+      compileTasks.forEach { (abi, task) ->
+        when {
+          // `buildCMakeDebug[arm64-v8a]` for debug
+          ccm.name.contains("Debug") && ccm.name.contains(abi) && task.name.contains("Debug") ->
+            ccm.dependsOn(task)
+          // `buildCMakeRelWithDebInfo[arm64-v8a]` for release
+          ccm.name.contains("RelWithDebInfo") &&
+            ccm.name.contains(abi) &&
+            task.name.contains("Release") -> ccm.dependsOn(task)
         }
       }
-  }
+    }
 }
 
 private fun AndroidArch.toClangPath(ndkDir: File, apiLevel: Int): String {
