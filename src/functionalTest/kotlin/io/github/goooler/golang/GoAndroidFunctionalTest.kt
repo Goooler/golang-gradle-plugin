@@ -105,6 +105,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       import "C"
 
+      //export Noop
+      func Noop() {}
+
       func main() {}
       """
         .trimIndent()
@@ -171,6 +174,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       package main
 
       import "C"
+
+      //export Noop
+      func Noop() {}
 
       func main() {}
       """
