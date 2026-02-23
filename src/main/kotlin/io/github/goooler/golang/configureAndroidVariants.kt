@@ -60,7 +60,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
   androidComponents.onVariants { variant ->
     val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
     val compileTasks =
-      AndroidArch.entries.map { abi ->
+      AndroidArch.entries.associate { abi ->
         val taskName = "compileGo${variant.name.capitalize()}${abi.normalized.capitalize()}"
         val task =
           tasks.register(taskName, GoCompile::class.java) { task ->
@@ -134,30 +134,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               }
             )
           }
-        abi to task
+        abi.abi to task
       }
-
-    val buildType = variant.buildType.orEmpty()
-    val cmakeBuildType =
-      when (buildType.lowercase(Locale.ROOT)) {
-        "release" -> "RelWithDebInfo"
-        else -> buildType.capitalize()
-      }
-    val variantNameCapitalized = variant.name.capitalize()
-    val buildTypeCapitalized = buildType.capitalize()
-    val cmakeVariantName =
-      if (buildType.isNotEmpty() && variantNameCapitalized.endsWith(buildTypeCapitalized)) {
-        variantNameCapitalized.removeSuffix(buildTypeCapitalized) + cmakeBuildType
-      } else {
-        variantNameCapitalized
-      }
-    val cmakeTaskDeps =
-      compileTasks.associate { (abi, compileTask) ->
-        // `buildCMakeDebug[arm64-v8a]` for debug
-        // `buildCMakeRelWithDebInfo[arm64-v8a]` for release
-        "buildCMake$cmakeVariantName[${abi.abi}]" to compileTask
-      }
-    tasks.configureEach { task -> cmakeTaskDeps[task.name]?.let { task.dependsOn(it) } }
 
     val mergeTask =
       tasks.register(
@@ -166,7 +144,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       ) { merge ->
         val libraryFiles =
           compileTasks.map { (abi, task) ->
-            MergeGoJniLibsTask.LibraryFile(abi.abi, task.map { it.outputFile })
+            MergeGoJniLibsTask.LibraryFile(abi, task.map { it.outputFile })
           }
         merge.libraryFiles.convention(libraryFiles)
         merge.destinationDir.convention(
@@ -175,6 +153,22 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       }
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
+
+    tasks
+      .named { it.startsWith("configureCMake") }
+      .configureEach { ccm ->
+        compileTasks.forEach { (abi, task) ->
+          when {
+            // `buildCMakeDebug[arm64-v8a]` for debug
+            ccm.name.contains("Debug") && ccm.name.contains(abi) && task.name.contains("Debug") ->
+              ccm.dependsOn(task)
+            // `buildCMakeRelWithDebInfo[arm64-v8a]` for release
+            ccm.name.contains("RelWithDebInfo") &&
+              ccm.name.contains(abi) &&
+              task.name.contains("Release") -> ccm.dependsOn(task)
+          }
+        }
+      }
   }
 }
 
