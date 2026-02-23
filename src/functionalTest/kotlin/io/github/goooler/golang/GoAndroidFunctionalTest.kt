@@ -325,6 +325,64 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake tasks only depend on their own variant's go compile tasks`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-variant-isolation-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.isolated"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+
+        flavorDimensions += "version"
+        productFlavors {
+          create("demo") {
+            dimension = "version"
+          }
+          create("full") {
+            dimension = "version"
+          }
+        }
+      }
+
+      // Simulate CMake tasks that AGP would normally create for each flavor's debug variant
+      tasks.register("buildCMakeDemoDebug[armeabi-v7a]")
+      tasks.register("buildCMakeFullDebug[armeabi-v7a]")
+      """
+        .trimIndent()
+    )
+
+    val demoResult = runWithSuccess("--dry-run", "buildCMakeDemoDebug[armeabi-v7a]")
+
+    // Should depend on the demo debug Go compile task
+    assertThat(demoResult.output).contains(":compileGoDemoDebugArm32 SKIPPED")
+    // Must NOT pull in the full variant's Go compile task
+    assertThat(demoResult.output).doesNotContain(":compileGoFullDebugArm32")
+    assertThat(demoResult.output).contains(":buildCMakeDemoDebug[armeabi-v7a] SKIPPED")
+
+    val fullResult = runWithSuccess("--dry-run", "buildCMakeFullDebug[armeabi-v7a]")
+
+    // Should depend on the full debug Go compile task
+    assertThat(fullResult.output).contains(":compileGoFullDebugArm32 SKIPPED")
+    // Must NOT pull in the demo variant's Go compile task
+    assertThat(fullResult.output).doesNotContain(":compileGoDemoDebugArm32")
+    assertThat(fullResult.output).contains(":buildCMakeFullDebug[armeabi-v7a] SKIPPED")
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """
