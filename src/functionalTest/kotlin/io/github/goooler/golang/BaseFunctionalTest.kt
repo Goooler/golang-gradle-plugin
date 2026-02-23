@@ -3,9 +3,12 @@ package io.github.goooler.golang
 import assertk.assertThat
 import assertk.assertions.doesNotContain
 import java.nio.file.Path
+import java.util.Properties
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.writeText
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
@@ -18,7 +21,7 @@ abstract class BaseFunctionalTest {
   lateinit var projectRoot: Path
     private set
 
-  var ndkVersion: String? = null
+  lateinit var ndkVersion: String
     private set
 
   @BeforeEach
@@ -26,17 +29,22 @@ abstract class BaseFunctionalTest {
     val ndkHome =
       System.getenv("ANDROID_NDK")
         ?: System.getenv("ANDROID_NDK_HOME")
-        ?: System.getenv("ANDROID_NDK_LATEST_HOME")
-    if (ndkHome != null) {
-      val normalizedNdkHome = ndkHome.replace("\\", "\\\\")
-      projectRoot.resolve("local.properties").writeText("ndk.dir=$normalizedNdkHome\n")
+        ?: System.getProperty("ANDROID_HOME")?.let {
+          Path(it).resolve("ndk").firstOrNull()?.absolutePathString()
+        }
+        ?: error(
+          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_HOME environment variable."
+        )
 
-      val propsFile = java.io.File(ndkHome, "source.properties")
-      if (propsFile.exists()) {
-        val props = java.util.Properties()
-        props.load(propsFile.inputStream())
-        ndkVersion = props.getProperty("Pkg.Revision")
-      }
+    val properties = Properties().apply { setProperty("ndk.dir", ndkHome) }
+    projectRoot.resolve("local.properties").outputStream().use { properties.store(it, null) }
+
+    val propsFile = Path(ndkHome).resolve("source.properties")
+    if (propsFile.exists()) {
+      val props = Properties().apply { load(propsFile.inputStream()) }
+      ndkVersion = props.getProperty("Pkg.Revision")
+    } else {
+      error("source.properties not found in NDK directory: $ndkHome")
     }
   }
 
