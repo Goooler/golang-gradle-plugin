@@ -45,12 +45,15 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
     }
   val ndkDirectory =
     androidComponents.sdkComponents.ndkDirectory.orElse(
-      layout.dir(
-        providers
-          .environmentVariable("ANDROID_NDK_LATEST_HOME")
-          .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
-          .orElse(providers.environmentVariable("ANDROID_NDK"))
-      )
+      objects
+        .directoryProperty()
+        .fileProvider(
+          providers
+            .environmentVariable("ANDROID_NDK_LATEST_HOME")
+            .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
+            .orElse(providers.environmentVariable("ANDROID_NDK"))
+            .map { File(it) }
+        )
     )
 
   androidComponents.onVariants { variant ->
