@@ -3,6 +3,7 @@ package io.github.goooler.golang
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.exists
 import assertk.assertions.isNotNull
 import java.util.Properties

@@ -168,7 +168,6 @@ private fun Project.configureCMakeTasks(
   variantName: String,
   compileTasks: Map<String, TaskProvider<GoCompile>>,
 ) {
-  val capitalizedVariantName = variantName.capitalize()
   tasks
     .named { it.startsWith("configureCMake") || it.startsWith("buildCMake") }
     .configureEach { cmake ->
@@ -177,14 +176,14 @@ private fun Project.configureCMakeTasks(
 
         // Extract the variant segment between the task prefix and the ABI bracket.
         // e.g. "buildCMakeDemoRelWithDebInfo[arm64-v8a]" → "DemoRelWithDebInfo"
-        val prefix = if (cmake.name.startsWith("buildCMake")) "buildCMake" else "configureCMake"
-        val cmakeVariantSegment = cmake.name.substringAfter(prefix).substringBefore("[")
+        val cmakeVariantSegment =
+          cmake.name.removePrefix("configureCMake").removePrefix("buildCMake").substringBefore("[")
 
         // Normalize CMake-specific build-type suffixes to their Android variant equivalents.
         val normalizedSegment =
           cmakeVariantSegment.replace("RelWithDebInfo", "Release").replace("MinSizeRel", "Release")
 
-        if (normalizedSegment == capitalizedVariantName) {
+        if (normalizedSegment == variantName.capitalize()) {
           cmake.dependsOn(goCompile)
           logger.info("Hooked: {} now depends on {}", cmake.name, goCompile.name)
         }
