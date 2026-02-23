@@ -105,6 +105,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       import "C"
 
+      //export Noop
+      func Noop() {}
+
       func main() {}
       """
         .trimIndent()
@@ -116,8 +119,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     AndroidArch.values.forEach { abi ->
       val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
-      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so"))
-        .exists()
+      assertThat(libFile).exists()
+      val headerFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.h")
+      assertThat(headerFile).exists()
 
       val mergedLibFile =
         projectRoot.resolve("build/generated/jniLibs/mergeGoJniLibsDebug/$abi/${libFile.name}")
@@ -171,6 +175,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       import "C"
 
+      //export Noop
+      func Noop() {}
+
       func main() {}
       """
         .trimIndent()
@@ -182,7 +189,8 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     AndroidArch.values.forEach { abi ->
       val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
-      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so"))
+      assertThat(libFile).exists()
+      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.h"))
         .exists()
 
       val mergedLibFile =
