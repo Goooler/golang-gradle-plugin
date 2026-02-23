@@ -10,6 +10,7 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isExecutable
 import assertk.assertions.key
+import assertk.assertions.startsWith
 import com.android.build.api.dsl.LibraryExtension
 import io.github.goooler.golang.GoBuildMode
 import io.github.goooler.golang.GoExtension
@@ -18,6 +19,7 @@ import java.io.File
 import kotlin.io.path.Path
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.io.TempDir
@@ -150,19 +152,21 @@ class GoCompileTest {
   @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
   fun `GoCompile environment reads ndk dir from local properties`(@TempDir tempDir: File) {
-    val ndkDir =
-      System.getenv("ANDROID_NDK")
-        ?: System.getenv("ANDROID_NDK_HOME")
-        ?: System.getenv("ANDROID_NDK_LATEST_HOME")
-        ?: run {
-          // Discover the NDK from the Android SDK if no env var is set
-          val androidHome = System.getenv("ANDROID_HOME")
-          File(androidHome, "ndk").listFiles()?.sortedDescending()?.firstOrNull()?.absolutePath
-        }
-        ?: return // skip if no NDK found at all
+    // Skip if env vars or an SDK-installed NDK would take precedence over local.properties.
+    val androidHome = System.getenv("ANDROID_HOME")!!
+    assumeFalse(
+      System.getenv("ANDROID_NDK") != null ||
+        System.getenv("ANDROID_NDK_HOME") != null ||
+        System.getenv("ANDROID_NDK_LATEST_HOME") != null ||
+        File(androidHome, "ndk").listFiles()?.isNotEmpty() == true ||
+        File(androidHome, "ndk-bundle").exists()
+    )
+
+    val fakeNdkDir = File(tempDir, "fake-ndk")
+    fakeNdkDir.mkdirs()
 
     val localProperties = File(tempDir, "local.properties")
-    localProperties.writeText("ndk.dir=$ndkDir\n")
+    localProperties.writeText("ndk.dir=${fakeNdkDir.absolutePath}\n")
 
     val project = ProjectBuilder.builder().withProjectDir(tempDir).build()
     project.plugins.apply("com.android.library")
@@ -175,11 +179,8 @@ class GoCompileTest {
 
     project.afterEvaluate {
       val task = project.tasks.named("compileGoDebugArm64", GoCompile::class.java).get()
-      assertThat(task.environment.get()).all {
-        contains("CGO_ENABLED", "1")
-        contains("GOOS", "android")
-        key("CC").transform { Path(it) }.exists()
-      }
+      val cc = task.environment.get()["CC"] ?: error("CC not set")
+      assertThat(cc).startsWith(fakeNdkDir.absolutePath)
     }
   }
 
