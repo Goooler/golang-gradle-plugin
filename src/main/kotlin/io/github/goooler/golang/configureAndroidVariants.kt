@@ -155,7 +155,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
     tasks
-      .named { it.startsWith("configureCMake") }
+      .named { it.startsWith("buildCMake") }
       .configureEach { ccm ->
         compileTasks.forEach { (abi, task) ->
           when {
