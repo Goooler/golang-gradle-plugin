@@ -144,7 +144,6 @@ class GoCompileTest {
     }
   }
 
-  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
   @Test
   fun `GoCompile environment reads ndk dir from local properties`(@TempDir tempDir: File) {
     // Skip if env vars or an SDK-installed NDK would take precedence over local.properties.
