@@ -57,6 +57,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ${ndkVersion?.let { "ndkVersion = \"$it\"" }.orEmpty()}
         defaultConfig {
           minSdk = 24
         }
@@ -122,6 +123,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ${ndkVersion?.let { "ndkVersion = \"$it\"" }.orEmpty()}
         defaultConfig {
           minSdk = 24
         }
@@ -187,6 +189,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ${ndkVersion?.let { "ndkVersion = \"$it\"" }.orEmpty()}
         defaultConfig {
           minSdk = 24
         }
@@ -222,6 +225,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ${ndkVersion?.let { "ndkVersion = \"$it\"" }.orEmpty()}
         defaultConfig {
           minSdk = 24
         }
@@ -257,6 +261,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go.flavored"
         compileSdk = 35
+        ${ndkVersion?.let { "ndkVersion = \"$it\"" }.orEmpty()}
         defaultConfig {
           minSdk = 24
         }
@@ -299,6 +304,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ${ndkVersion?.let { "ndkVersion = \"$it\"" }.orEmpty()}
         defaultConfig {
           minSdk = 24
         }

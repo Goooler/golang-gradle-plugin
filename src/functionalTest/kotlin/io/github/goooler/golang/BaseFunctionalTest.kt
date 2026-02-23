@@ -5,8 +5,10 @@ import assertk.assertions.doesNotContain
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
 
@@ -15,6 +17,28 @@ abstract class BaseFunctionalTest {
   @TempDir
   lateinit var projectRoot: Path
     private set
+
+  var ndkVersion: String? = null
+    private set
+
+  @BeforeEach
+  fun setupLocalProperties() {
+    val ndkHome =
+      System.getenv("ANDROID_NDK")
+        ?: System.getenv("ANDROID_NDK_HOME")
+        ?: System.getenv("ANDROID_NDK_LATEST_HOME")
+    if (ndkHome != null) {
+      val normalizedNdkHome = ndkHome.replace("\\", "\\\\")
+      projectRoot.resolve("local.properties").writeText("ndk.dir=$normalizedNdkHome\n")
+
+      val propsFile = java.io.File(ndkHome, "source.properties")
+      if (propsFile.exists()) {
+        val props = java.util.Properties()
+        props.load(propsFile.inputStream())
+        ndkVersion = props.getProperty("Pkg.Revision")
+      }
+    }
+  }
 
   val buildFile: Path
     get() = projectRoot.resolve("build.gradle.kts")
