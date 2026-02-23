@@ -172,7 +172,7 @@ private fun Project.configureCMakeTasks(
     .named { it.startsWith("configureCMake") || it.startsWith("buildCMake") }
     .configureEach { cmake ->
       compileTasks.forEach { (abi, goCompile) ->
-        if (!cmake.name.contains(abi)) return@forEach
+        if (!cmake.name.contains("[$abi]")) return@forEach
 
         // Extract the variant segment between the task prefix and the ABI bracket.
         // e.g. "buildCMakeDemoRelWithDebInfo[arm64-v8a]" → "DemoRelWithDebInfo"
