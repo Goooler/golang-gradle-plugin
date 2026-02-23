@@ -13,7 +13,6 @@ import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.name
-import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +23,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     private set
 
   @BeforeEach
-  fun setupLocalProperties() {
+  fun setupNdkVersion() {
     System.getenv("ANDROID_SDK_ROOT")
       ?: System.getenv("ANDROID_HOME")
       ?: error(
@@ -38,9 +37,6 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         ?: error(
           "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_NDK_LATEST_HOME environment variable."
         )
-
-    val properties = Properties().apply { setProperty("ndk.dir", ndkHome) }
-    projectRoot.resolve("local.properties").outputStream().use { properties.store(it, null) }
 
     val propsFile = Path(ndkHome).resolve("source.properties")
     if (propsFile.exists()) {
