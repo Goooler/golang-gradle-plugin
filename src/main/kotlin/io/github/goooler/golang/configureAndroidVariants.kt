@@ -128,6 +128,11 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 base.file("${variant.name}/${abi.abi}/$fileName")
               }
             )
+            task.outputHeaderFile.convention(
+              baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                base.file("${variant.name}/${abi.abi}/${fileName.substringBeforeLast('.')}.h")
+              }
+            )
           }
         abi to task
       }

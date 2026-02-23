@@ -116,7 +116,8 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     AndroidArch.values.forEach { abi ->
       val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
-      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so"))
+      assertThat(libFile).exists()
+      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.h"))
         .exists()
 
       val mergedLibFile =
@@ -182,7 +183,8 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     AndroidArch.values.forEach { abi ->
       val libFile = projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so")
-      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.so"))
+      assertThat(libFile).exists()
+      assertThat(projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-test.h"))
         .exists()
 
       val mergedLibFile =

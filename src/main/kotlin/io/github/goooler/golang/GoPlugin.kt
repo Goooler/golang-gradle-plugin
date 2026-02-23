@@ -51,6 +51,11 @@ public abstract class GoPlugin : Plugin<Project> {
                 base.file("${sourceSet.name}/$fileName")
               }
             )
+            task.outputHeaderFile.convention(
+              baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                base.file("${sourceSet.name}/${fileName.substringBeforeLast('.')}.h")
+              }
+            )
           }
         }
       }

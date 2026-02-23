@@ -36,6 +36,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public abstract val workingDir: DirectoryProperty
   @get:OutputFile public abstract val outputFile: RegularFileProperty
+  @get:OutputFile @get:Optional public abstract val outputHeaderFile: RegularFileProperty
 
   @TaskAction
   public fun compile() {
