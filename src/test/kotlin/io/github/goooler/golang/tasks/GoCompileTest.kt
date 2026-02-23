@@ -14,11 +14,13 @@ import com.android.build.api.dsl.LibraryExtension
 import io.github.goooler.golang.GoBuildMode
 import io.github.goooler.golang.GoExtension
 import io.github.goooler.golang.GoPlugin
+import java.io.File
 import kotlin.io.path.Path
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
+import org.junit.jupiter.api.io.TempDir
 
 class GoCompileTest {
   @Test
@@ -142,6 +144,42 @@ class GoCompileTest {
     project.afterEvaluate {
       val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
       assertThat(task.compilerArgs.get()).isEqualTo(listOf("-v", "-trimpath", "-ldflags", "-s -w"))
+    }
+  }
+
+  @EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
+  @Test
+  fun `GoCompile environment reads ndk dir from local properties`(
+    @TempDir tempDir: File,
+  ) {
+    val ndkDir = System.getenv("ANDROID_NDK")
+      ?: System.getenv("ANDROID_NDK_HOME")
+      ?: System.getenv("ANDROID_NDK_LATEST_HOME")
+      ?: run {
+        // Discover the NDK from the Android SDK if no env var is set
+        val androidHome = System.getenv("ANDROID_HOME")
+        File(androidHome, "ndk").listFiles()?.sortedDescending()?.firstOrNull()?.absolutePath
+      } ?: return // skip if no NDK found at all
+
+    val localProperties = File(tempDir, "local.properties")
+    localProperties.writeText("ndk.dir=$ndkDir\n")
+
+    val project = ProjectBuilder.builder().withProjectDir(tempDir).build()
+    project.plugins.apply("com.android.library")
+    project.plugins.apply("io.github.goooler.golang")
+
+    val android = project.extensions.getByType(LibraryExtension::class.java)
+    android.compileSdk = 35
+    android.namespace = "com.example.go"
+    android.defaultConfig { minSdk = 24 }
+
+    project.afterEvaluate {
+      val task = project.tasks.named("compileGoDebugArm64", GoCompile::class.java).get()
+      assertThat(task.environment.get()).all {
+        contains("CGO_ENABLED", "1")
+        contains("GOOS", "android")
+        key("CC").transform { Path(it) }.exists()
+      }
     }
   }
 

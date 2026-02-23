@@ -52,6 +52,16 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             .environmentVariable("ANDROID_NDK")
             .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
             .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
+            .orElse(
+              providers
+                .fileContents(rootProject.layout.projectDirectory.file("local.properties"))
+                .asText
+                .map { content ->
+                  java.util.Properties()
+                    .apply { load(content.reader()) }
+                    .getProperty("ndk.dir")
+                }
+            )
             .map { File(it) }
         )
     )
