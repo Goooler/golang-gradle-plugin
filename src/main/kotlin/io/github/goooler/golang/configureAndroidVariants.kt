@@ -43,7 +43,18 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       registerSourceType("go")
       registerSourceType("golang")
     }
-  val ndkDirectory = androidComponents.sdkComponents.ndkDirectory
+  val ndkDirectory =
+    androidComponents.sdkComponents.ndkDirectory.orElse(
+      objects
+        .directoryProperty()
+        .fileProvider(
+          providers
+            .environmentVariable("ANDROID_NDK")
+            .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
+            .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
+            .map { File(it) }
+        )
+    )
 
   androidComponents.onVariants { variant ->
     val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
