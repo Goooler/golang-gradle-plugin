@@ -30,7 +30,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     val ndkHome =
       System.getenv("ANDROID_NDK")
         ?: System.getenv("ANDROID_NDK_HOME")
-        ?: System.getProperty("ANDROID_HOME")?.let {
+        ?: System.getenv("ANDROID_HOME")?.let {
           Path(it).resolve("ndk").firstOrNull()?.absolutePathString()
         }
         ?: error(
@@ -43,7 +43,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     val propsFile = Path(ndkHome).resolve("source.properties")
     if (propsFile.exists()) {
       val props = Properties().apply { load(propsFile.inputStream()) }
-      ndkVersion = props.getProperty("Pkg.Revision")
+      ndkVersion =
+        props.getProperty("Pkg.Revision")
+          ?: error("Pkg.Revision not found or blank in NDK source.properties: $propsFile")
     } else {
       error("source.properties not found in NDK directory: $ndkHome")
     }
