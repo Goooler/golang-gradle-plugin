@@ -31,7 +31,12 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       System.getenv("ANDROID_NDK")
         ?: System.getenv("ANDROID_NDK_HOME")
         ?: System.getenv("ANDROID_HOME")?.let {
-          Path(it).resolve("ndk").firstOrNull()?.absolutePathString()
+          val ndkDir = Path(it).resolve("ndk")
+          if (ndkDir.exists()) {
+            ndkDir.firstOrNull()?.absolutePathString()
+          } else {
+            null
+          }
         }
         ?: error(
           "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_HOME environment variable."
