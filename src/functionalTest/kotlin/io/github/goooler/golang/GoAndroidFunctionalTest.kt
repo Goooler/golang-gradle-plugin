@@ -5,17 +5,47 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.exists
 import assertk.assertions.isNotNull
+import java.util.Properties
 import java.util.jar.JarFile
+import kotlin.io.path.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
 import kotlin.io.path.name
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
-@EnabledIfEnvironmentVariable(named = "ANDROID_HOME", matches = ".+")
 class GoAndroidFunctionalTest : BaseFunctionalTest() {
+
+  lateinit var ndkVersion: String
+    private set
+
+  @BeforeEach
+  fun setupNdkVersion() {
+    System.getenv("ANDROID_SDK_ROOT")
+      ?: System.getenv("ANDROID_HOME")
+      ?: error(
+        "SDK path not found. Please set ANDROID_SDK_ROOT or ANDROID_HOME environment variable."
+      )
+
+    val ndkHome =
+      System.getenv("ANDROID_NDK")
+        ?: System.getenv("ANDROID_NDK_HOME")
+        ?: System.getenv("ANDROID_NDK_LATEST_HOME")
+        ?: error(
+          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_NDK_LATEST_HOME environment variable."
+        )
+
+    val propsFile = Path(ndkHome).resolve("source.properties")
+    if (propsFile.exists()) {
+      val props = Properties().apply { load(propsFile.inputStream()) }
+      ndkVersion = checkNotNull(props.getProperty("Pkg.Revision"))
+    } else {
+      error("source.properties not found in NDK directory: $ndkHome")
+    }
+  }
 
   @BeforeEach
   fun beforeEach() {
@@ -57,6 +87,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
         }
@@ -122,6 +153,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
         }
@@ -187,6 +219,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
         }
@@ -222,6 +255,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
         }
@@ -257,6 +291,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go.flavored"
         compileSdk = 35
+        ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
         }
@@ -299,6 +334,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       android {
         namespace = "com.example.go"
         compileSdk = 35
+        ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
         }
