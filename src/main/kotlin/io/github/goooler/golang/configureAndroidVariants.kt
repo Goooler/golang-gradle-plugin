@@ -58,7 +58,11 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 .fileContents(rootProject.layout.projectDirectory.file("local.properties"))
                 .asText
                 .map { content ->
-                  Properties().apply { load(content.reader()) }.getProperty("ndk.dir")?.trim()?.takeIf { it.isNotBlank() }
+                  Properties()
+                    .apply { load(content.reader()) }
+                    .getProperty("ndk.dir")
+                    ?.trim()
+                    ?.takeIf { it.isNotBlank() }
                 }
             )
             .map { File(it) }
