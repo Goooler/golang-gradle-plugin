@@ -40,7 +40,6 @@ public abstract class io/github/goooler/golang/tasks/GoCompile : org/gradle/api/
 	public abstract fun getExecutable ()Lorg/gradle/api/provider/Property;
 	public abstract fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getOutputFileName ()Lorg/gradle/api/provider/Property;
-	public abstract fun getOutputHeader ()Lorg/gradle/api/file/RegularFileProperty;
 	public abstract fun getPackageName ()Lorg/gradle/api/provider/Property;
 	public abstract fun getWorkingDir ()Lorg/gradle/api/file/DirectoryProperty;
 }
