@@ -43,9 +43,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     val propsFile = Path(ndkHome).resolve("source.properties")
     if (propsFile.exists()) {
       val props = Properties().apply { load(propsFile.inputStream()) }
-      ndkVersion =
-        props.getProperty("Pkg.Revision")
-          ?: error("Pkg.Revision not found or blank in NDK source.properties: $propsFile")
+      ndkVersion = checkNotNull(props.getProperty("Pkg.Revision"))
     } else {
       error("source.properties not found in NDK directory: $ndkHome")
     }
