@@ -183,7 +183,7 @@ private fun Project.configureCMakeTasks(compileTasks: Map<String, TaskProvider<G
 
         if (isDebugMatch || isReleaseMatch) {
           cmake.dependsOn(goCompile)
-          logger.info("Hooked: $cmakeName now depends on $goTaskName")
+          logger.info("Hooked: {} now depends on {}", cmakeName, goTaskName)
         }
       }
     }
