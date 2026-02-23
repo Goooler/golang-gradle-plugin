@@ -55,7 +55,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
             .orElse(
               providers
-                .fileContents(rootProject.layout.projectDirectory.file("local.properties"))
+                .fileContents(isolated.rootProject.projectDirectory.file("local.properties"))
                 .asText
                 .map { content ->
                   Properties()
