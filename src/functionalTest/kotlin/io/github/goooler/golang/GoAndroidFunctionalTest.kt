@@ -392,21 +392,21 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     // Additional coverage: ensure x86_64 CMake tasks only depend on x86_64 Go compile tasks,
     // and do not accidentally depend on x86 Go compile tasks (substring ABI name edge case).
-    val demoX86_64Result = runWithSuccess("--dry-run", "buildCMakeDemoDebug[x86_64]")
+    val demoX64Result = runWithSuccess("--dry-run", "buildCMakeDemoDebug[x86_64]")
 
     // Should depend on the demo debug Go compile task for x86_64
-    assertThat(demoX86_64Result.output).contains(":compileGoDemoDebugX64 SKIPPED")
+    assertThat(demoX64Result.output).contains(":compileGoDemoDebugX64 SKIPPED")
     // Must NOT pull in the demo debug Go compile task for x86
-    assertThat(demoX86_64Result.output).doesNotContain(":compileGoDemoDebugX86 ")
-    assertThat(demoX86_64Result.output).contains(":buildCMakeDemoDebug[x86_64] SKIPPED")
+    assertThat(demoX64Result.output).doesNotContain(":compileGoDemoDebugX86 ")
+    assertThat(demoX64Result.output).contains(":buildCMakeDemoDebug[x86_64] SKIPPED")
 
-    val fullX86_64Result = runWithSuccess("--dry-run", "buildCMakeFullDebug[x86_64]")
+    val fullX64Result = runWithSuccess("--dry-run", "buildCMakeFullDebug[x86_64]")
 
     // Should depend on the full debug Go compile task for x86_64
-    assertThat(fullX86_64Result.output).contains(":compileGoFullDebugX64 SKIPPED")
+    assertThat(fullX64Result.output).contains(":compileGoFullDebugX64 SKIPPED")
     // Must NOT pull in the full debug Go compile task for x86
-    assertThat(fullX86_64Result.output).doesNotContain(":compileGoFullDebugX86 ")
-    assertThat(fullX86_64Result.output).contains(":buildCMakeFullDebug[x86_64] SKIPPED")
+    assertThat(fullX64Result.output).doesNotContain(":compileGoFullDebugX86 ")
+    assertThat(fullX64Result.output).contains(":buildCMakeFullDebug[x86_64] SKIPPED")
 
     // Additional coverage: tasks with numeric suffixes (e.g., -2) must also depend on the
     // correct variant's Go compile task.
