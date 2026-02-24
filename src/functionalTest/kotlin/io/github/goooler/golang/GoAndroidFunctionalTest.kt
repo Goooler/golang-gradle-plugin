@@ -361,7 +361,15 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       // Simulate CMake tasks that AGP would normally create for each flavor's debug variant
       tasks.register("buildCMakeDemoDebug[armeabi-v7a]")
+      tasks.register("buildCMakeDemoDebug[x86_64]")
       tasks.register("buildCMakeFullDebug[armeabi-v7a]")
+      tasks.register("buildCMakeFullDebug[x86_64]")
+      // Simulate tasks with numeric suffixes (AGP may append -N when multiple CMake configs exist)
+      tasks.register("buildCMakeDemoDebug[armeabi-v7a]-2")
+      tasks.register("buildCMakeFullDebug[armeabi-v7a]-2")
+      // Simulate configureCMake tasks (AGP creates these alongside buildCMake tasks)
+      tasks.register("configureCMakeDemoDebug[armeabi-v7a]")
+      tasks.register("configureCMakeFullDebug[armeabi-v7a]")
       """
         .trimIndent()
     )
@@ -381,6 +389,54 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     // Must NOT pull in the demo variant's Go compile task
     assertThat(fullResult.output).doesNotContain(":compileGoDemoDebugArm32")
     assertThat(fullResult.output).contains(":buildCMakeFullDebug[armeabi-v7a] SKIPPED")
+
+    // Additional coverage: ensure x86_64 CMake tasks only depend on x86_64 Go compile tasks,
+    // and do not accidentally depend on x86 Go compile tasks (substring ABI name edge case).
+    val demoX64Result = runWithSuccess("--dry-run", "buildCMakeDemoDebug[x86_64]")
+
+    // Should depend on the demo debug Go compile task for x86_64
+    assertThat(demoX64Result.output).contains(":compileGoDemoDebugX64 SKIPPED")
+    // Must NOT pull in the demo debug Go compile task for x86
+    assertThat(demoX64Result.output).doesNotContain(":compileGoDemoDebugX86 ")
+    assertThat(demoX64Result.output).contains(":buildCMakeDemoDebug[x86_64] SKIPPED")
+
+    val fullX64Result = runWithSuccess("--dry-run", "buildCMakeFullDebug[x86_64]")
+
+    // Should depend on the full debug Go compile task for x86_64
+    assertThat(fullX64Result.output).contains(":compileGoFullDebugX64 SKIPPED")
+    // Must NOT pull in the full debug Go compile task for x86
+    assertThat(fullX64Result.output).doesNotContain(":compileGoFullDebugX86 ")
+    assertThat(fullX64Result.output).contains(":buildCMakeFullDebug[x86_64] SKIPPED")
+
+    // Additional coverage: tasks with numeric suffixes (e.g., -2) must also depend on the
+    // correct variant's Go compile task.
+    val demoNumericSuffixResult = runWithSuccess("--dry-run", "buildCMakeDemoDebug[armeabi-v7a]-2")
+
+    assertThat(demoNumericSuffixResult.output).contains(":compileGoDemoDebugArm32 SKIPPED")
+    assertThat(demoNumericSuffixResult.output).doesNotContain(":compileGoFullDebugArm32")
+    assertThat(demoNumericSuffixResult.output)
+      .contains(":buildCMakeDemoDebug[armeabi-v7a]-2 SKIPPED")
+
+    val fullNumericSuffixResult = runWithSuccess("--dry-run", "buildCMakeFullDebug[armeabi-v7a]-2")
+
+    assertThat(fullNumericSuffixResult.output).contains(":compileGoFullDebugArm32 SKIPPED")
+    assertThat(fullNumericSuffixResult.output).doesNotContain(":compileGoDemoDebugArm32")
+    assertThat(fullNumericSuffixResult.output)
+      .contains(":buildCMakeFullDebug[armeabi-v7a]-2 SKIPPED")
+
+    // Additional coverage: configureCMake tasks must also depend on the correct variant's Go
+    // compile task (not just buildCMake tasks).
+    val demoConfigureResult = runWithSuccess("--dry-run", "configureCMakeDemoDebug[armeabi-v7a]")
+
+    assertThat(demoConfigureResult.output).contains(":compileGoDemoDebugArm32 SKIPPED")
+    assertThat(demoConfigureResult.output).doesNotContain(":compileGoFullDebugArm32")
+    assertThat(demoConfigureResult.output).contains(":configureCMakeDemoDebug[armeabi-v7a] SKIPPED")
+
+    val fullConfigureResult = runWithSuccess("--dry-run", "configureCMakeFullDebug[armeabi-v7a]")
+
+    assertThat(fullConfigureResult.output).contains(":compileGoFullDebugArm32 SKIPPED")
+    assertThat(fullConfigureResult.output).doesNotContain(":compileGoDemoDebugArm32")
+    assertThat(fullConfigureResult.output).contains(":configureCMakeFullDebug[armeabi-v7a] SKIPPED")
   }
 
   @Test
