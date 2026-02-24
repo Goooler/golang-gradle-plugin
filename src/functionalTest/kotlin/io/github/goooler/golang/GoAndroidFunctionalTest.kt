@@ -426,21 +426,17 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     // Additional coverage: configureCMake tasks must also depend on the correct variant's Go
     // compile task (not just buildCMake tasks).
-    val demoConfigureResult =
-      runWithSuccess("--dry-run", "configureCMakeDemoDebug[armeabi-v7a]")
+    val demoConfigureResult = runWithSuccess("--dry-run", "configureCMakeDemoDebug[armeabi-v7a]")
 
     assertThat(demoConfigureResult.output).contains(":compileGoDemoDebugArm32 SKIPPED")
     assertThat(demoConfigureResult.output).doesNotContain(":compileGoFullDebugArm32")
-    assertThat(demoConfigureResult.output)
-      .contains(":configureCMakeDemoDebug[armeabi-v7a] SKIPPED")
+    assertThat(demoConfigureResult.output).contains(":configureCMakeDemoDebug[armeabi-v7a] SKIPPED")
 
-    val fullConfigureResult =
-      runWithSuccess("--dry-run", "configureCMakeFullDebug[armeabi-v7a]")
+    val fullConfigureResult = runWithSuccess("--dry-run", "configureCMakeFullDebug[armeabi-v7a]")
 
     assertThat(fullConfigureResult.output).contains(":compileGoFullDebugArm32 SKIPPED")
     assertThat(fullConfigureResult.output).doesNotContain(":compileGoDemoDebugArm32")
-    assertThat(fullConfigureResult.output)
-      .contains(":configureCMakeFullDebug[armeabi-v7a] SKIPPED")
+    assertThat(fullConfigureResult.output).contains(":configureCMakeFullDebug[armeabi-v7a] SKIPPED")
   }
 
   @Test
