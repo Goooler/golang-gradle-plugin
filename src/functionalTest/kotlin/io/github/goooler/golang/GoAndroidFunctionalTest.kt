@@ -326,6 +326,65 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake tasks without flavor prefix depend on flavored go compile tasks`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-flavorless-name-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.flavorless"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+
+        flavorDimensions += "tier"
+        productFlavors {
+          create("meta") {
+            dimension = "tier"
+          }
+        }
+      }
+
+      // Simulate CMake tasks that AGP creates WITHOUT the flavor prefix in the name.
+      // This happens in real projects like ClashMetaForAndroid where CMake tasks are
+      // named buildCMakeRelWithDebInfo[arm64-v8a]-2 even though the variant is metaRelease.
+      tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]")
+      tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]-2")
+      tasks.register("configureCMakeRelWithDebInfo[armeabi-v7a]")
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]")
+
+    assertThat(result.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
+    assertThat(result.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a] SKIPPED")
+
+    // Numeric suffix variant
+    val numericResult = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]-2")
+
+    assertThat(numericResult.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
+    assertThat(numericResult.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a]-2 SKIPPED")
+
+    // configureCMake variant
+    val configResult = runWithSuccess("--dry-run", "configureCMakeRelWithDebInfo[armeabi-v7a]")
+
+    assertThat(configResult.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
+    assertThat(configResult.output).contains(":configureCMakeRelWithDebInfo[armeabi-v7a] SKIPPED")
+  }
+
+  @Test
   fun `cmake tasks only depend on their own variant's go compile tasks`() {
     settingsFile.appendText(
       """
