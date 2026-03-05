@@ -49,8 +49,7 @@ jobs:
   publish-snapshot:
     needs: build-status
     runs-on: ubuntu-24.04-arm
-    if: false # Temporarily disabled.
-#    if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
+    if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
