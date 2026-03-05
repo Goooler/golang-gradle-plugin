@@ -183,7 +183,7 @@ private fun Project.configureCMakeTasks(
         val normalizedSegment =
           cmakeVariantSegment.replace("RelWithDebInfo", "Release").replace("MinSizeRel", "Release")
 
-        if (normalizedSegment == variantName.capitalize()) {
+        if (variantName.capitalize().endsWith(normalizedSegment)) {
           cmake.dependsOn(goCompile)
           logger.info("Hooked: {} now depends on {}", cmake.name, goCompile.name)
         }
