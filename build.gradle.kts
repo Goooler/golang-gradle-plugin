@@ -141,7 +141,7 @@ gradlePlugin {
     }
   }
 
-  testSourceSets(sourceSets["functionalTest"])
+  testSourceSets(sourceSets["test"], sourceSets["functionalTest"])
 }
 
 tasks.withType<JavaCompile>().configureEach {
