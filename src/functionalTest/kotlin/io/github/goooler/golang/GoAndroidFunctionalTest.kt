@@ -362,26 +362,49 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]")
       tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]-2")
       tasks.register("configureCMakeRelWithDebInfo[armeabi-v7a]")
+      // Debug CMake tasks without the flavor prefix
+      tasks.register("buildCMakeDebug[x86_64]")
+      tasks.register("buildCMakeDebug[x86_64]-2")
+      tasks.register("configureCMakeDebug[x86_64]")
       """
         .trimIndent()
     )
 
+    // Release CMake tasks without flavor prefix
     val result = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]")
 
     assertThat(result.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
     assertThat(result.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a] SKIPPED")
 
-    // Numeric suffix variant
+    // Release with numeric suffix
     val numericResult = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]-2")
 
     assertThat(numericResult.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
     assertThat(numericResult.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a]-2 SKIPPED")
 
-    // configureCMake variant
+    // Release configureCMake
     val configResult = runWithSuccess("--dry-run", "configureCMakeRelWithDebInfo[armeabi-v7a]")
 
     assertThat(configResult.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
     assertThat(configResult.output).contains(":configureCMakeRelWithDebInfo[armeabi-v7a] SKIPPED")
+
+    // Debug CMake tasks without flavor prefix
+    val debugResult = runWithSuccess("--dry-run", "buildCMakeDebug[x86_64]")
+
+    assertThat(debugResult.output).contains(":compileGoMetaDebugX64 SKIPPED")
+    assertThat(debugResult.output).contains(":buildCMakeDebug[x86_64] SKIPPED")
+
+    // Debug with numeric suffix
+    val debugNumericResult = runWithSuccess("--dry-run", "buildCMakeDebug[x86_64]-2")
+
+    assertThat(debugNumericResult.output).contains(":compileGoMetaDebugX64 SKIPPED")
+    assertThat(debugNumericResult.output).contains(":buildCMakeDebug[x86_64]-2 SKIPPED")
+
+    // Debug configureCMake
+    val debugConfigResult = runWithSuccess("--dry-run", "configureCMakeDebug[x86_64]")
+
+    assertThat(debugConfigResult.output).contains(":compileGoMetaDebugX64 SKIPPED")
+    assertThat(debugConfigResult.output).contains(":configureCMakeDebug[x86_64] SKIPPED")
   }
 
   @Test
