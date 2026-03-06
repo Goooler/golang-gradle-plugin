@@ -176,14 +176,32 @@ private fun Project.configureCMakeTasks(
 
         // Extract the variant segment between the task prefix and the ABI bracket.
         // e.g. "buildCMakeDemoRelWithDebInfo[arm64-v8a]" → "DemoRelWithDebInfo"
-        val cmakeVariantSegment =
-          cmake.name.removePrefix("configureCMake").removePrefix("buildCMake").substringBefore("[")
+        // or "configureCMakeRelWithDebInfo[arm64-v8a]-2" → "RelWithDebInfo"
+        val cmakeVariantSegment = cmake.name.substringAfter("CMake").substringBefore("[")
 
         // Normalize CMake-specific build-type suffixes to their Android variant equivalents.
         val normalizedSegment =
           cmakeVariantSegment.replace("RelWithDebInfo", "Release").replace("MinSizeRel", "Release")
 
-        if (variantName.capitalize().endsWith(normalizedSegment)) {
+        // Check if the current variant name matches the normalized segment from the CMake task.
+        // E.g. variantName = "metaRelease", normalizedSegment = "MetaRelease" (or ends with it if
+        // flavor is omitted)
+        val capitalizedVariant = variantName.capitalize()
+
+        val isMatch =
+          when {
+            // Exact match (e.g. flavor part exists in CMake task name)
+            normalizedSegment.equals(capitalizedVariant, ignoreCase = true) -> true
+            // Fallback for cases where flavor is missing from CMake task name (e.g. just
+            // "RelWithDebInfo")
+            // In AGP < 8.3, we assume configuration for this variant must depend on it
+            // Note: AGP appends "-N" for multiple flavors. This adds dependencies for all matching
+            // endsWith variants.
+            capitalizedVariant.endsWith(normalizedSegment, ignoreCase = true) -> true
+            else -> false
+          }
+
+        if (isMatch) {
           cmake.dependsOn(goCompile)
           logger.info("Hooked: {} now depends on {}", cmake.name, goCompile.name)
         }
