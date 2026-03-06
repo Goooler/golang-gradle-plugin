@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-go@v6
         if: contains(matrix.os, 'macos') # TODO: https://github.com/actions/runner-images/issues/13675
         with:
-          go-version: 1.26.0
+          go-version: 1.26.1
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew build "-PtestGradleVersion=${{ matrix.gradle }}" --stacktrace
 
