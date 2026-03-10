@@ -2,7 +2,7 @@
 jdkRelease = "17"
 minGradle = "9.0.0"
 kotlin = "2.3.20-RC3"
-agp = "9.0.1"
+agp = "9.1.0"
 
 [libraries]
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0-alpha05"
