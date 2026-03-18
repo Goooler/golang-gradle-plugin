@@ -53,11 +53,10 @@ spotless {
   kotlinGradle { ktfmt(libs.ktfmt.get().version).googleStyle() }
 }
 
-val testPluginClasspath by
-  configurations.registering {
-    isCanBeResolved = true
-    description = "Plugins used in integration tests could be resolved in classpath."
-  }
+val testPluginClasspath by configurations.registering {
+  isCanBeResolved = true
+  description = "Plugins used in integration tests could be resolved in classpath."
+}
 
 configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
   attributes.attribute(
