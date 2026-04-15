@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/Goooler/golang-gradle-plugin/compare/0.1.0...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Don't cache `GoCompile` for `C_SHARED`/`C_ARCHIVE` by default.
 
 ## [0.1.0](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.1.0) - 2026-03-05
 

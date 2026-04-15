@@ -38,6 +38,19 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @get:OutputFile public abstract val outputFile: RegularFileProperty
   @get:OutputFile @get:Optional public abstract val outputHeaderFile: RegularFileProperty
 
+  init {
+    // Go c-shared/c-archive produces a companion header that some downstream native
+    // builds require during configure. On clean CI workspaces this file must always
+    // be generated locally to avoid relying on remote cache artifacts.
+    outputs.doNotCacheIf("c-shared/c-archive outputs must be produced locally") {
+      when (buildMode.orNull) {
+        GoBuildMode.C_SHARED,
+        GoBuildMode.C_ARCHIVE -> true
+        else -> false
+      }
+    }
+  }
+
   @TaskAction
   public fun compile() {
     val output = outputFile.get().asFile.absolutePath
