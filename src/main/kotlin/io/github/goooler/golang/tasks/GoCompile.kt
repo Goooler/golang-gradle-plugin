@@ -25,19 +25,6 @@ import org.gradle.process.ExecOperations
 public abstract class GoCompile @Inject constructor(private val execOperations: ExecOperations) :
   SourceTask() {
 
-  init {
-    // Go c-shared/c-archive produces a companion header that some downstream native
-    // builds require during configure. On clean CI workspaces this file must always
-    // be generated locally to avoid relying on remote cache artifacts.
-    outputs.doNotCacheIf("c-shared/c-archive outputs must be produced locally") {
-      when (buildMode.orNull) {
-        GoBuildMode.C_SHARED,
-        GoBuildMode.C_ARCHIVE -> true
-        else -> false
-      }
-    }
-  }
-
   @get:Input public abstract val compilerArgs: ListProperty<String>
   @get:Input public abstract val environment: MapProperty<String, String>
   @get:Input public abstract val buildMode: Property<GoBuildMode>
@@ -50,6 +37,19 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   public abstract val workingDir: DirectoryProperty
   @get:OutputFile public abstract val outputFile: RegularFileProperty
   @get:OutputFile @get:Optional public abstract val outputHeaderFile: RegularFileProperty
+
+  init {
+    // Go c-shared/c-archive produces a companion header that some downstream native
+    // builds require during configure. On clean CI workspaces this file must always
+    // be generated locally to avoid relying on remote cache artifacts.
+    outputs.doNotCacheIf("c-shared/c-archive outputs must be produced locally") {
+      when (buildMode.orNull) {
+        GoBuildMode.C_SHARED,
+        GoBuildMode.C_ARCHIVE -> true
+        else -> false
+      }
+    }
+  }
 
   @TaskAction
   public fun compile() {
