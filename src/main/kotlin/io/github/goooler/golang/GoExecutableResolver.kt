@@ -6,7 +6,7 @@ import org.gradle.api.provider.ProviderFactory
 
 internal fun resolveGoExecutable(providerFactory: ProviderFactory): Provider<String> {
   return providerFactory.provider {
-    val goRoot = System.getenv("GOROOT")
+    val goRoot = providerFactory.environmentVariable("GOROOT").orNull
     val os = OS.current
     val goName = if (os == OS.WINDOWS) "go.exe" else "go"
 
