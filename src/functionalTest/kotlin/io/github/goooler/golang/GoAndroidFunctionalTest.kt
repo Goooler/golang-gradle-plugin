@@ -141,6 +141,66 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `android go compile tasks are executed after clean instead of FROM-CACHE`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-android-cache-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+      }
+      """
+        .trimIndent()
+    )
+
+    val goFile = projectRoot.resolve("src/main/go/main.go")
+    goFile.createParentDirectories()
+    goFile.writeText(
+      """
+      package main
+
+      import "C"
+
+      //export Noop
+      func Noop() {}
+
+      func main() {}
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess("assembleDebug")
+    runWithSuccess("clean")
+    val secondBuild = runWithSuccess("assembleDebug")
+
+    assertThat(secondBuild.output).doesNotContain(":compileGoDebugArm64 FROM-CACHE")
+    assertThat(secondBuild.output).doesNotContain(":compileGoDebugArm32 FROM-CACHE")
+    assertThat(secondBuild.output).doesNotContain(":compileGoDebugX86 FROM-CACHE")
+    assertThat(secondBuild.output).doesNotContain(":compileGoDebugX64 FROM-CACHE")
+
+    AndroidArch.values.forEach { abi ->
+      assertThat(
+          projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-cache-test.h")
+        )
+        .exists()
+    }
+  }
+
+  @Test
   fun `can run android task with golang source dir`() {
     settingsFile.appendText(
       """
