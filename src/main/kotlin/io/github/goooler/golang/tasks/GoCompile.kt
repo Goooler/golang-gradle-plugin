@@ -26,7 +26,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   SourceTask() {
 
   init {
-    // Go c-shared/c-archive produce a companion header that some downstream native
+    // Go c-shared/c-archive produces a companion header that some downstream native
     // builds require during configure. On clean CI workspaces this file must always
     // be generated locally to avoid relying on remote cache artifacts.
     outputs.doNotCacheIf("c-shared/c-archive outputs must be produced locally") {
