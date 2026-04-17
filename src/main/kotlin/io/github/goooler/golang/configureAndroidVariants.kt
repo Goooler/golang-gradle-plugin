@@ -154,26 +154,13 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
-    configureCMakeTasks(
-      variant.name,
-      compileTasks,
-      isVariantExplicitlyRequested = isVariantExplicitlyRequested(variant.name),
-    )
+    configureCMakeTasks(variant.name, compileTasks)
   }
 }
 
-private fun Project.isVariantExplicitlyRequested(variantName: String): Boolean {
-  val normalizedVariantName = variantName.capitalize()
-  return gradle.startParameter.taskNames
-    .asSequence()
-    .map { it.substringAfterLast(':') }
-    .any { it.contains(normalizedVariantName) }
-}
-
 private fun Project.hasRequestedFlavoredVariantFor(buildType: String): Boolean {
-  val regex = Regex("[A-Z][A-Za-z0-9]+$buildType")
+  val regex = "[A-Z][A-Za-z0-9]+$buildType".toRegex()
   return gradle.startParameter.taskNames
-    .asSequence()
     .map { it.substringAfterLast(':') }
     .filterNot { it.startsWith("buildCMake") || it.startsWith("configureCMake") }
     .any { regex.containsMatchIn(it) }
@@ -187,8 +174,12 @@ private fun Project.hasRequestedFlavoredVariantFor(buildType: String): Boolean {
 private fun Project.configureCMakeTasks(
   variantName: String,
   compileTasks: Map<String, TaskProvider<GoCompile>>,
-  isVariantExplicitlyRequested: Boolean,
 ) {
+  val isVariantExplicitlyRequested =
+    gradle.startParameter.taskNames
+      .map { it.substringAfterLast(':') }
+      .any { it.contains(variantName.capitalize()) }
+
   tasks
     .named { it.startsWith("configureCMake") || it.startsWith("buildCMake") }
     .configureEach { cmake ->
