@@ -582,6 +582,58 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `assemble flavored release does not trigger other flavor go compile tasks for flavorless cmake names`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-flavorless-release-isolation-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.flavorless.release"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+
+        flavorDimensions += "tier"
+        productFlavors {
+          create("alpha") {
+            dimension = "tier"
+          }
+          create("meta") {
+            dimension = "tier"
+          }
+        }
+      }
+
+      // Simulate AGP flavorless CMake task name for release.
+      tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]")
+
+      // Simulate a variant-specific entry task triggering the CMake task.
+      tasks.register("triggerMetaRelease") {
+        dependsOn("buildCMakeRelWithDebInfo[armeabi-v7a]")
+      }
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("--dry-run", "triggerMetaRelease")
+
+    assertThat(result.output).contains(":compileGoMetaReleaseArm32 SKIPPED")
+    assertThat(result.output).doesNotContain(":compileGoAlphaReleaseArm32")
+    assertThat(result.output).contains(":buildCMakeRelWithDebInfo[armeabi-v7a] SKIPPED")
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """

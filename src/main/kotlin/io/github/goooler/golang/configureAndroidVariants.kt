@@ -154,8 +154,29 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
 
-    configureCMakeTasks(variant.name, compileTasks)
+    configureCMakeTasks(
+      variant.name,
+      compileTasks,
+      isVariantExplicitlyRequested = isVariantExplicitlyRequested(variant.name),
+    )
   }
+}
+
+private fun Project.isVariantExplicitlyRequested(variantName: String): Boolean {
+  val normalizedVariantName = variantName.capitalize()
+  return gradle.startParameter.taskNames
+    .asSequence()
+    .map { it.substringAfterLast(':') }
+    .any { it.contains(normalizedVariantName) }
+}
+
+private fun Project.hasRequestedFlavoredVariantFor(buildType: String): Boolean {
+  val regex = Regex("[A-Z][A-Za-z0-9]+$buildType")
+  return gradle.startParameter.taskNames
+    .asSequence()
+    .map { it.substringAfterLast(':') }
+    .filterNot { it.startsWith("buildCMake") || it.startsWith("configureCMake") }
+    .any { regex.containsMatchIn(it) }
 }
 
 /**
@@ -166,6 +187,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 private fun Project.configureCMakeTasks(
   variantName: String,
   compileTasks: Map<String, TaskProvider<GoCompile>>,
+  isVariantExplicitlyRequested: Boolean,
 ) {
   tasks
     .named { it.startsWith("configureCMake") || it.startsWith("buildCMake") }
@@ -181,6 +203,15 @@ private fun Project.configureCMakeTasks(
         // Normalize CMake-specific build-type suffixes to their Android variant equivalents.
         val normalizedSegment =
           cmakeVariantSegment.replace("RelWithDebInfo", "Release").replace("MinSizeRel", "Release")
+
+        val isFlavorlessCmakeTask = normalizedSegment == "Debug" || normalizedSegment == "Release"
+        if (
+          isFlavorlessCmakeTask &&
+            !isVariantExplicitlyRequested &&
+            hasRequestedFlavoredVariantFor(normalizedSegment)
+        ) {
+          return@forEach
+        }
 
         if (variantName.capitalize().endsWith(normalizedSegment)) {
           cmake.dependsOn(goCompile)
