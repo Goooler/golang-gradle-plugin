@@ -141,6 +141,63 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `release build exposes header under CMake build type path`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-android-release-header-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+      }
+      """
+        .trimIndent()
+    )
+
+    val goFile = projectRoot.resolve("src/main/go/main.go")
+    goFile.createParentDirectories()
+    goFile.writeText(
+      """
+      package main
+
+      import "C"
+
+      //export Noop
+      func Noop() {}
+
+      func main() {}
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("assembleRelease")
+
+    assertThat(result.output).contains("BUILD SUCCESSFUL")
+
+    AndroidArch.values.forEach { abi ->
+      assertThat(
+          projectRoot.resolve(
+            "build/intermediates/go/release/$abi/libgo-android-release-header-test.h"
+          )
+        )
+        .exists()
+    }
+  }
+
+  @Test
   fun `android go compile tasks are executed after clean instead of FROM-CACHE`() {
     settingsFile.appendText(
       """
