@@ -37,7 +37,9 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   public abstract val workingDir: DirectoryProperty
   @get:OutputFile public abstract val outputFile: RegularFileProperty
   @get:OutputFile @get:Optional public abstract val outputHeaderFile: RegularFileProperty
-  @get:OutputFile @get:Optional public abstract val outputCompatibilityHeaderFile: RegularFileProperty
+  @get:OutputFile
+  @get:Optional
+  public abstract val outputCompatibilityHeaderFile: RegularFileProperty
 
   init {
     // Go c-shared/c-archive produces a companion header that some downstream native

@@ -189,11 +189,15 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
     AndroidArch.values.forEach { abi ->
       assertThat(
-          projectRoot.resolve("build/intermediates/go/release/$abi/libgo-android-release-header-test.h")
+          projectRoot.resolve(
+            "build/intermediates/go/release/$abi/libgo-android-release-header-test.h"
+          )
         )
         .exists()
       assertThat(
-          projectRoot.resolve("build/intermediates/go/Release/$abi/libgo-android-release-header-test.h")
+          projectRoot.resolve(
+            "build/intermediates/go/Release/$abi/libgo-android-release-header-test.h"
+          )
         )
         .exists()
     }
