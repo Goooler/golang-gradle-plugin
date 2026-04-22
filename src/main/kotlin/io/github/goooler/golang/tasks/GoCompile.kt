@@ -37,6 +37,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   public abstract val workingDir: DirectoryProperty
   @get:OutputFile public abstract val outputFile: RegularFileProperty
   @get:OutputFile @get:Optional public abstract val outputHeaderFile: RegularFileProperty
+  @get:OutputFile @get:Optional public abstract val outputCompatibilityHeaderFile: RegularFileProperty
 
   init {
     // Go c-shared/c-archive produces a companion header that some downstream native
@@ -77,6 +78,18 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
         spec.args(args)
       }
       .assertNormalExitValue()
+
+    val generatedHeader = outputHeaderFile.orNull?.asFile
+    val compatibilityHeader = outputCompatibilityHeaderFile.orNull?.asFile
+    if (
+      generatedHeader != null &&
+        compatibilityHeader != null &&
+        generatedHeader.exists() &&
+        generatedHeader.absolutePath != compatibilityHeader.absolutePath
+    ) {
+      compatibilityHeader.parentFile.mkdirs()
+      generatedHeader.copyTo(compatibilityHeader, overwrite = true)
+    }
   }
 
   public companion object {

@@ -60,6 +60,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
   androidComponents.onVariants { variant ->
     val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
+    val hasProductFlavors = variant.productFlavors.isNotEmpty()
     val compileTasks =
       AndroidArch.entries.associate { abi ->
         val taskName = "compileGo${variant.name.capitalize()}${abi.normalized.capitalize()}"
@@ -134,6 +135,15 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 base.file("${variant.name}/${abi.abi}/${fileName.substringBeforeLast('.')}.h")
               }
             )
+            if (!hasProductFlavors) {
+              task.outputCompatibilityHeaderFile.convention(
+                baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                  base.file(
+                    "${variant.buildType.orEmpty().capitalize()}/${abi.abi}/${fileName.substringBeforeLast('.')}.h"
+                  )
+                }
+              )
+            }
           }
         abi.abi to task
       }
