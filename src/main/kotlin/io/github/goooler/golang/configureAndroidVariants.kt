@@ -181,7 +181,7 @@ private fun Project.configureCMakeTasks(
       .any { it.contains(variantName.capitalize()) }
 
   tasks
-    .named { it.startsWith("configureCMake") || it.startsWith("buildCMake") }
+    .matching { it.name.startsWith("configureCMake") || it.name.startsWith("buildCMake") }
     .configureEach { cmake ->
       compileTasks.forEach { (abi, goCompile) ->
         if (!cmake.name.contains("[$abi]")) return@forEach

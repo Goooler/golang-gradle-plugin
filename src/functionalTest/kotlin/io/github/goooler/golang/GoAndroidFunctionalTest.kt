@@ -634,6 +634,69 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake tasks registered after plugin configuration still get dependencies`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-late-registration-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.late"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+      }
+
+      // Simulate CMake tasks being registered AFTER plugin configuration completes.
+      // This is the common case where AGP registers CMake tasks during afterEvaluate.
+      afterEvaluate {
+        tasks.register("buildCMakeRelWithDebInfo[arm64-v8a]")
+        tasks.register("configureCMakeRelWithDebInfo[arm64-v8a]")
+      }
+      """
+        .trimIndent()
+    )
+
+    val goFile = projectRoot.resolve("src/main/go/main.go")
+    goFile.createParentDirectories()
+    goFile.writeText(
+      """
+      package main
+
+      import "C"
+
+      //export Noop
+      func Noop() {}
+
+      func main() {}
+      """
+        .trimIndent()
+    )
+
+    val result = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[arm64-v8a]")
+
+    // Verify that the Go compile task is a dependency even though the CMake task
+    // was registered after the plugin configuration phase.
+    assertThat(result.output).contains(":compileGoReleaseArm64 SKIPPED")
+    assertThat(result.output).contains(":buildCMakeRelWithDebInfo[arm64-v8a] SKIPPED")
+
+    val configResult = runWithSuccess("--dry-run", "configureCMakeRelWithDebInfo[arm64-v8a]")
+
+    assertThat(configResult.output).contains(":compileGoReleaseArm64 SKIPPED")
+    assertThat(configResult.output).contains(":configureCMakeRelWithDebInfo[arm64-v8a] SKIPPED")
+  }
+
+  @Test
   fun `can run android task with flavors`() {
     settingsFile.appendText(
       """
