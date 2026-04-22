@@ -7,9 +7,6 @@
 
 ## [0.1.3](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.1.3) - 2026-04-22
 
-### Fixed
-
-- Fix header file not found when running `assembleRelease`.
 
 ## [0.1.2](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.1.2) - 2026-04-17
 
