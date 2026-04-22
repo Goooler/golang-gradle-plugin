@@ -132,18 +132,15 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             )
             task.outputHeaderFile.convention(
               baseOutputDir.zip(task.outputFileName) { base, fileName ->
-                base.file("${variant.name}/${abi.abi}/${fileName.substringBeforeLast('.')}.h")
+                val filePath =
+                  if (hasProductFlavors) {
+                    "${variant.name}/${abi.abi}/${fileName.substringBeforeLast('.')}.h"
+                  } else {
+                    "${checkNotNull(variant.buildType).capitalize()}/${abi.abi}/${fileName.substringBeforeLast('.')}.h"
+                  }
+                base.file(filePath)
               }
             )
-            if (!hasProductFlavors) {
-              task.outputCompatibilityHeaderFile.convention(
-                baseOutputDir.zip(task.outputFileName) { base, fileName ->
-                  base.file(
-                    "${variant.buildType.orEmpty().capitalize()}/${abi.abi}/${fileName.substringBeforeLast('.')}.h"
-                  )
-                }
-              )
-            }
           }
         abi.abi to task
       }
