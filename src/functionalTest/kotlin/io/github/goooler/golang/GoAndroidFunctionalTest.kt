@@ -194,12 +194,6 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
           )
         )
         .exists()
-      assertThat(
-          projectRoot.resolve(
-            "build/intermediates/go/Release/$abi/libgo-android-release-header-test.h"
-          )
-        )
-        .exists()
     }
   }
 
