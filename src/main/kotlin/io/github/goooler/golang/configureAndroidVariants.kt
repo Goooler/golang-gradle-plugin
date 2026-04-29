@@ -63,7 +63,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
     val abiFilters = variant.externalNativeBuild?.abiFilters?.orNull
     val compileTasks =
       AndroidArch.entries
-        .filter { abiFilters == null || it.abi in abiFilters }
+        // If the abiFilters is not configured, it would be either null or empty.
+        .filter { abiFilters.isNullOrEmpty() || it.abi in abiFilters }
         .associate { arch ->
           val taskName = "compileGo${variant.name.capitalize()}${arch.normalized.capitalize()}"
           val task =
