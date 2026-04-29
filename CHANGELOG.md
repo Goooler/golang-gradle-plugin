@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [Unreleased](https://github.com/Goooler/golang-gradle-plugin/compare/0.1.4...HEAD) - 2026-xx-xx
+## [0.2.0](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.2.0) - 2026-04-29
 
 ### Added
 
