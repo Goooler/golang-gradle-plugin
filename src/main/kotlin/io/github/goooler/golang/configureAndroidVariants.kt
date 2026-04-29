@@ -60,10 +60,10 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
   androidComponents.onVariants { variant ->
     val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
-    val abiFilters = variant.externalNativeBuild?.abiFilters?.get().orEmpty()
+    val abiFilters = variant.externalNativeBuild?.abiFilters?.orNull
     val compileTasks =
       AndroidArch.entries
-        .filter { it.abi in abiFilters }
+        .filter { abiFilters == null || it.abi in abiFilters }
         .associate { arch ->
           val taskName = "compileGo${variant.name.capitalize()}${arch.normalized.capitalize()}"
           val task =
