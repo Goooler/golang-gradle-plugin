@@ -61,8 +61,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
   androidComponents.onVariants { variant ->
     val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
     val compileTasks =
-      AndroidArch.entries.associate { abi ->
-        val taskName = "compileGo${variant.name.capitalize()}${abi.normalized.capitalize()}"
+      AndroidArch.entries.associate { arch ->
+        val taskName = "compileGo${variant.name.capitalize()}${arch.normalized.capitalize()}"
         val task =
           tasks.register(taskName, GoCompile::class.java) { task ->
             task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.C_SHARED))
@@ -80,9 +80,9 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                 mapOf(
                   "CGO_ENABLED" to "1",
                   "GOOS" to "android",
-                  "GOARCH" to abi.toGoArch(),
-                  "GOARM" to abi.toGoArm(),
-                  "CC" to abi.toClangPath(ndkDir.asFile, variant.minSdk.apiLevel),
+                  "GOARCH" to arch.toGoArch(),
+                  "GOARM" to arch.toGoArm(),
+                  "CC" to arch.toClangPath(ndkDir.asFile, variant.minSdk.apiLevel),
                 )
               }
             )
@@ -126,16 +126,16 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             )
             task.outputFile.convention(
               baseOutputDir.zip(task.outputFileName) { base, fileName ->
-                base.file("${variant.name}/${abi.abi}/$fileName")
+                base.file("${variant.name}/${arch.abi}/$fileName")
               }
             )
             task.outputHeaderFile.convention(
               baseOutputDir.zip(task.outputFileName) { base, fileName ->
-                base.file("${variant.name}/${abi.abi}/${fileName.substringBeforeLast('.')}.h")
+                base.file("${variant.name}/${arch.abi}/${fileName.substringBeforeLast('.')}.h")
               }
             )
           }
-        abi.abi to task
+        arch.abi to task
       }
 
     val mergeTask =
