@@ -9,6 +9,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isExecutable
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.key
 import com.android.build.api.dsl.LibraryExtension
 import io.github.goooler.golang.GoBuildMode
@@ -138,6 +140,38 @@ class GoCompileTest {
     project.afterEvaluate {
       val task = project.tasks.named("compileGoReleaseArm64", GoCompile::class.java).get()
       assertThat(task.compilerArgs.get()).isEqualTo(listOf("-v", "-trimpath", "-ldflags", "-s -w"))
+    }
+  }
+
+  @Test
+  fun `only abiFilter abis register go compile tasks for android variants`() {
+    val project = ProjectBuilder.builder().build()
+    project.plugins.apply("com.android.library")
+    project.plugins.apply("io.github.goooler.golang")
+
+    val android = project.extensions.getByType(LibraryExtension::class.java)
+    android.compileSdk = 35
+    android.namespace = "com.example.go"
+    android.defaultConfig {
+      minSdk = 24
+      externalNativeBuild {
+        cmake {
+          abiFilters += "arm64-v8a"
+          abiFilters += "x86"
+        }
+      }
+    }
+
+    project.afterEvaluate {
+      assertThat(project.tasks.findByName("compileGoDebugArm64")).isNotNull()
+      assertThat(project.tasks.findByName("compileGoDebugX86")).isNotNull()
+      assertThat(project.tasks.findByName("compileGoDebugX64")).isNull()
+      assertThat(project.tasks.findByName("compileGoDebugArm32")).isNull()
+
+      assertThat(project.tasks.findByName("compileGoReleaseArm64")).isNotNull()
+      assertThat(project.tasks.findByName("compileGoReleaseX86")).isNotNull()
+      assertThat(project.tasks.findByName("compileGoReleaseX64")).isNull()
+      assertThat(project.tasks.findByName("compileGoReleaseArm32")).isNull()
     }
   }
 

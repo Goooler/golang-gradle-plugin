@@ -60,83 +60,86 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
 
   androidComponents.onVariants { variant ->
     val isRelease = variant.buildType.orEmpty().lowercase(Locale.ROOT) == "release"
+    val abiFilters = variant.externalNativeBuild?.abiFilters?.orNull
     val compileTasks =
-      AndroidArch.entries.associate { arch ->
-        val taskName = "compileGo${variant.name.capitalize()}${arch.normalized.capitalize()}"
-        val task =
-          tasks.register(taskName, GoCompile::class.java) { task ->
-            task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.C_SHARED))
-            task.packageName.convention(goExtension.packageName)
-            task.buildTags.convention(goExtension.buildTags)
-            task.compilerArgs.convention(
-              goExtension.compilerArgs.map { args ->
-                if (isRelease) args + listOf("-trimpath", "-ldflags", "-s -w") else args
-              }
-            )
-            task.executable.convention(goExtension.executable)
-            task.workingDir.convention(goExtension.workingDir)
-            task.environment.convention(
-              ndkDirectory.map { ndkDir ->
-                mapOf(
-                  "CGO_ENABLED" to "1",
-                  "GOOS" to "android",
-                  "GOARCH" to arch.toGoArch(),
-                  "GOARM" to arch.toGoArm(),
-                  "CC" to arch.toClangPath(ndkDir.asFile, variant.minSdk.apiLevel),
-                )
-              }
-            )
+      AndroidArch.entries
+        .filter { abiFilters == null || it.abi in abiFilters }
+        .associate { arch ->
+          val taskName = "compileGo${variant.name.capitalize()}${arch.normalized.capitalize()}"
+          val task =
+            tasks.register(taskName, GoCompile::class.java) { task ->
+              task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.C_SHARED))
+              task.packageName.convention(goExtension.packageName)
+              task.buildTags.convention(goExtension.buildTags)
+              task.compilerArgs.convention(
+                goExtension.compilerArgs.map { args ->
+                  if (isRelease) args + listOf("-trimpath", "-ldflags", "-s -w") else args
+                }
+              )
+              task.executable.convention(goExtension.executable)
+              task.workingDir.convention(goExtension.workingDir)
+              task.environment.convention(
+                ndkDirectory.map { ndkDir ->
+                  mapOf(
+                    "CGO_ENABLED" to "1",
+                    "GOOS" to "android",
+                    "GOARCH" to arch.toGoArch(),
+                    "GOARM" to arch.toGoArm(),
+                    "CC" to arch.toClangPath(ndkDir.asFile, variant.minSdk.apiLevel),
+                  )
+                }
+              )
 
-            (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
-              val goSourceDirs =
-                sources.static.map { dirs ->
-                  dirs.map { dir ->
-                    val goDir = dir.asFile.resolveSibling("go")
-                    val golangDir = dir.asFile.resolveSibling("golang")
-                    when {
-                      goDir.exists() -> goDir
-                      golangDir.exists() -> golangDir
-                      else -> goDir
+              (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
+                val goSourceDirs =
+                  sources.static.map { dirs ->
+                    dirs.map { dir ->
+                      val goDir = dir.asFile.resolveSibling("go")
+                      val golangDir = dir.asFile.resolveSibling("golang")
+                      when {
+                        goDir.exists() -> goDir
+                        golangDir.exists() -> golangDir
+                        else -> goDir
+                      }
                     }
                   }
-                }
-              val goSourceSet = variant.sources.getByName("go")
-              val golangSourceSet = variant.sources.getByName("golang")
-              var workingDirAdded = false
-              goSourceDirs.get().forEach { selectedDir ->
-                if (selectedDir.name == "golang") {
-                  golangSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
-                } else {
-                  goSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
-                }
-                if (!workingDirAdded && selectedDir.exists()) {
-                  task.workingDir.convention(
-                    goExtension.workingDir.orElse(
-                      layout.projectDirectory.dir(selectedDir.absolutePath)
+                val goSourceSet = variant.sources.getByName("go")
+                val golangSourceSet = variant.sources.getByName("golang")
+                var workingDirAdded = false
+                goSourceDirs.get().forEach { selectedDir ->
+                  if (selectedDir.name == "golang") {
+                    golangSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
+                  } else {
+                    goSourceSet.addStaticSourceDirectory(selectedDir.absolutePath)
+                  }
+                  if (!workingDirAdded && selectedDir.exists()) {
+                    task.workingDir.convention(
+                      goExtension.workingDir.orElse(
+                        layout.projectDirectory.dir(selectedDir.absolutePath)
+                      )
                     )
-                  )
-                  workingDirAdded = true
+                    workingDirAdded = true
+                  }
                 }
+                task.source(goSourceDirs)
               }
-              task.source(goSourceDirs)
-            }
 
-            task.outputFileName.convention(
-              goExtension.outputFileName.orElse("lib${project.name}.so")
-            )
-            task.outputFile.convention(
-              baseOutputDir.zip(task.outputFileName) { base, fileName ->
-                base.file("${variant.name}/${arch.abi}/$fileName")
-              }
-            )
-            task.outputHeaderFile.convention(
-              baseOutputDir.zip(task.outputFileName) { base, fileName ->
-                base.file("${variant.name}/${arch.abi}/${fileName.substringBeforeLast('.')}.h")
-              }
-            )
-          }
-        arch.abi to task
-      }
+              task.outputFileName.convention(
+                goExtension.outputFileName.orElse("lib${project.name}.so")
+              )
+              task.outputFile.convention(
+                baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                  base.file("${variant.name}/${arch.abi}/$fileName")
+                }
+              )
+              task.outputHeaderFile.convention(
+                baseOutputDir.zip(task.outputFileName) { base, fileName ->
+                  base.file("${variant.name}/${arch.abi}/${fileName.substringBeforeLast('.')}.h")
+                }
+              )
+            }
+          arch.abi to task
+        }
 
     val mergeTask =
       tasks.register(
