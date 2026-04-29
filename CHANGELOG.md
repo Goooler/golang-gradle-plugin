@@ -3,6 +3,9 @@
 
 ## [Unreleased](https://github.com/Goooler/golang-gradle-plugin/compare/0.1.4...HEAD) - 2026-xx-xx
 
+### Added
+
+- Honor `abiFilters`.
 
 ## [0.1.4](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.1.4) - 2026-04-22
 

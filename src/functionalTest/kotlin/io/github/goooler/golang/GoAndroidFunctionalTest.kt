@@ -307,6 +307,70 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
+  fun `cmake tasks only depend on go compile tasks for abiFilter abis`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-cmake-abi-filter-deps-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go.abi.filtered"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+          externalNativeBuild {
+            cmake {
+              abiFilters += "armeabi-v7a"
+              abiFilters += "x86_64"
+            }
+          }
+        }
+        externalNativeBuild {
+          cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+          }
+        }
+      }
+
+      """
+        .trimIndent()
+    )
+
+    val cmakeFile = projectRoot.resolve("src/main/cpp/CMakeLists.txt")
+    cmakeFile.createParentDirectories()
+    cmakeFile.writeText(
+      """
+      cmake_minimum_required(VERSION 3.22.1)
+      project(dummy)
+      add_library(dummy SHARED dummy.cpp)
+      """
+        .trimIndent()
+    )
+    projectRoot.resolve("src/main/cpp/dummy.cpp").writeText("int dummy() { return 0; }")
+
+    val arm32Result = runWithSuccess("--dry-run", "buildCMakeDebug[armeabi-v7a]")
+    assertThat(arm32Result.output).contains(":compileGoDebugArm32 SKIPPED")
+    assertThat(arm32Result.output).contains(":buildCMakeDebug[armeabi-v7a] SKIPPED")
+
+    val x64Result = runWithSuccess("--dry-run", "buildCMakeDebug[x86_64]")
+    assertThat(x64Result.output).contains(":compileGoDebugX64 SKIPPED")
+    assertThat(x64Result.output).contains(":buildCMakeDebug[x86_64] SKIPPED")
+
+    val arm64Result = runWithFailure("--dry-run", "buildCMakeDebug[arm64-v8a]")
+    assertThat(arm64Result.output).doesNotContain(":compileGoDebugArm64")
+    assertThat(arm64Result.output).contains("Task 'buildCMakeDebug[arm64-v8a]' not found")
+  }
+
+  @Test
   fun `cmake release tasks depend on go compile tasks`() {
     settingsFile.appendText(
       """
