@@ -153,7 +153,10 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
         merge.libraryFiles.convention(libraryFiles)
       }
 
-    variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
+    variant.sources.jniLibs?.addGeneratedSourceDirectory(
+      mergeTask,
+      MergeGoJniLibsTask::destinationDir,
+    )
 
     configureCMakeTasks(variant.name, compileTasks)
   }
