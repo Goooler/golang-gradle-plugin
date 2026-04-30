@@ -151,9 +151,6 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
           MergeGoJniLibsTask.LibraryFile(abi, task.map { it.outputFile })
         }
         merge.libraryFiles.convention(libraryFiles)
-        merge.destinationDir.convention(
-          layout.buildDirectory.dir("generated/go/jniLibs/${variant.name}")
-        )
       }
 
     variant.sources.jniLibs?.addGeneratedSourceDirectory(mergeTask) { it.destinationDir }
