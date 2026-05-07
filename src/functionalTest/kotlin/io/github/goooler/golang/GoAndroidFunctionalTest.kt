@@ -141,7 +141,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
   }
 
   @Test
-  fun `android go compile tasks are executed after clean instead of FROM-CACHE`() {
+  fun `android go compile tasks are restored from build cache after clean`() {
     settingsFile.appendText(
       """
       rootProject.name = "go-android-cache-test"
@@ -187,14 +187,105 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     runWithSuccess("clean")
     val secondBuild = runWithSuccess("assembleDebug")
 
-    assertThat(secondBuild.output).doesNotContain(":compileGoDebugArm64 FROM-CACHE")
-    assertThat(secondBuild.output).doesNotContain(":compileGoDebugArm32 FROM-CACHE")
-    assertThat(secondBuild.output).doesNotContain(":compileGoDebugX86 FROM-CACHE")
-    assertThat(secondBuild.output).doesNotContain(":compileGoDebugX64 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugArm64 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugArm32 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugX86 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugX64 FROM-CACHE")
 
     AndroidArch.values.forEach { abi ->
       assertThat(
+          projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-cache-test.so")
+        )
+        .exists()
+      assertThat(
           projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-cache-test.h")
+        )
+        .exists()
+    }
+  }
+
+  @Test
+  fun `android cmake build can use cached go header after clean`() {
+    settingsFile.appendText(
+      """
+      rootProject.name = "go-android-cmake-cache-test"
+      """
+        .trimIndent()
+    )
+    buildFile.writeText(
+      """
+      plugins {
+        id("com.android.library")
+        id("io.github.goooler.golang")
+      }
+
+      android {
+        namespace = "com.example.go"
+        compileSdk = 35
+        ndkVersion = "$ndkVersion"
+        defaultConfig {
+          minSdk = 24
+        }
+        externalNativeBuild {
+          cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+          }
+        }
+      }
+      """
+        .trimIndent()
+    )
+
+    val goFile = projectRoot.resolve("src/main/go/main.go")
+    goFile.createParentDirectories()
+    goFile.writeText(
+      """
+      package main
+
+      import "C"
+
+      //export Noop
+      func Noop() {}
+
+      func main() {}
+      """
+        .trimIndent()
+    )
+
+    val cmakeFile = projectRoot.resolve("src/main/cpp/CMakeLists.txt")
+    cmakeFile.createParentDirectories()
+    cmakeFile.writeText(
+      """
+      cmake_minimum_required(VERSION 3.22.1)
+      project(dummy)
+      include_directories("${'$'}{CMAKE_SOURCE_DIR}/../../../build/intermediates/go/debug/${'$'}{ANDROID_ABI}")
+      add_library(dummy SHARED dummy.cpp)
+      """
+        .trimIndent()
+    )
+    projectRoot
+      .resolve("src/main/cpp/dummy.cpp")
+      .writeText(
+        """
+        #include "libgo-android-cmake-cache-test.h"
+
+        int dummy() { return 0; }
+        """
+          .trimIndent()
+      )
+
+    runWithSuccess("assembleDebug")
+    runWithSuccess("clean")
+    val secondBuild = runWithSuccess("assembleDebug")
+
+    assertThat(secondBuild.output).contains(":compileGoDebugArm64 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugArm32 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugX86 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":compileGoDebugX64 FROM-CACHE")
+
+    AndroidArch.values.forEach { abi ->
+      assertThat(
+          projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-cmake-cache-test.h")
         )
         .exists()
     }
