@@ -258,7 +258,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       cmake_minimum_required(VERSION 3.22.1)
       project(dummy)
-      include_directories("${'$'}{CMAKE_SOURCE_DIR}/../../../build/intermediates/go/debug/${'$'}{ANDROID_ABI}")
+      include_directories("${'$'}{CMAKE_SOURCE_DIR}/../../../build/generated/goHeaders/debug/${'$'}{ANDROID_ABI}")
       add_library(dummy SHARED dummy.cpp)
       """
         .trimIndent()
@@ -282,10 +282,16 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     assertThat(secondBuild.output).contains(":compileGoDebugArm32 FROM-CACHE")
     assertThat(secondBuild.output).contains(":compileGoDebugX86 FROM-CACHE")
     assertThat(secondBuild.output).contains(":compileGoDebugX64 FROM-CACHE")
+    assertThat(secondBuild.output).contains(":exportGoHeaderDebugArm64")
+    assertThat(secondBuild.output).contains(":exportGoHeaderDebugArm32")
+    assertThat(secondBuild.output).contains(":exportGoHeaderDebugX86")
+    assertThat(secondBuild.output).contains(":exportGoHeaderDebugX64")
 
     AndroidArch.values.forEach { abi ->
       assertThat(
-          projectRoot.resolve("build/intermediates/go/debug/$abi/libgo-android-cmake-cache-test.h")
+          projectRoot.resolve(
+            "build/generated/goHeaders/debug/$abi/libgo-android-cmake-cache-test.h"
+          )
         )
         .exists()
     }

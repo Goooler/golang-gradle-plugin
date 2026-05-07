@@ -1,6 +1,7 @@
 package io.github.goooler.golang
 
 import com.android.build.api.variant.AndroidComponentsExtension
+import io.github.goooler.golang.tasks.ExportGoHeaderTask
 import io.github.goooler.golang.tasks.GoCompile
 import io.github.goooler.golang.tasks.GoCompile.Companion.baseOutputDir
 import io.github.goooler.golang.tasks.MergeGoJniLibsTask
@@ -158,7 +159,20 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
       MergeGoJniLibsTask::destinationDir,
     )
 
-    configureCMakeTasks(variant.name, compileTasks)
+    val exportHeaderTasks = compileTasks.mapValues { (abi, goCompile) ->
+      tasks.register(
+        "exportGoHeader${variant.name.capitalize()}${AndroidArch.entries.first { it.abi == abi }.normalized.capitalize()}",
+        ExportGoHeaderTask::class.java,
+      ) { export ->
+        export.dependsOn(goCompile)
+        export.headerFile.convention(goCompile.flatMap { it.outputHeaderFile })
+        export.destinationDir.convention(
+          layout.buildDirectory.dir("generated/goHeaders/${variant.name}/$abi")
+        )
+      }
+    }
+
+    configureCMakeTasks(variant.name, exportHeaderTasks)
   }
 }
 
@@ -177,7 +191,7 @@ private fun Project.hasRequestedFlavoredVariantFor(buildType: String): Boolean {
  */
 private fun Project.configureCMakeTasks(
   variantName: String,
-  compileTasks: Map<String, TaskProvider<GoCompile>>,
+  exportHeaderTasks: Map<String, TaskProvider<ExportGoHeaderTask>>,
 ) {
   val isVariantExplicitlyRequested =
     gradle.startParameter.taskNames
@@ -187,7 +201,7 @@ private fun Project.configureCMakeTasks(
   tasks
     .named { it.startsWith("configureCMake") || it.startsWith("buildCMake") }
     .configureEach { cmake ->
-      compileTasks.forEach { (abi, goCompile) ->
+      exportHeaderTasks.forEach { (abi, exportHeader) ->
         if (!cmake.name.contains("[$abi]")) return@forEach
 
         // Extract the variant segment between the task prefix and the ABI bracket.
@@ -209,8 +223,8 @@ private fun Project.configureCMakeTasks(
         }
 
         if (variantName.capitalize().endsWith(normalizedSegment)) {
-          cmake.dependsOn(goCompile)
-          logger.info("Hooked: {} now depends on {}", cmake.name, goCompile.name)
+          cmake.dependsOn(exportHeader)
+          logger.info("Hooked: {} now depends on {}", cmake.name, exportHeader.name)
         }
       }
     }
