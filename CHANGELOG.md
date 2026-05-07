@@ -1,8 +1,12 @@
 # Change Log
 
 
-## [Unreleased](https://github.com/Goooler/golang-gradle-plugin/compare/0.2.1...HEAD) - 2026-xx-xx
+## [0.2.2](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.2.2) - 2026-05-07
 
+### Changed
+
+- No need to convention destinationDir.
+- Revert "Don't cache GoCompile for C_SHARED/C_ARCHIVE by default".
 
 ## [0.2.1](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.2.1) - 2026-04-29
 
