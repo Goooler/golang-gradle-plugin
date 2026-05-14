@@ -1,7 +1,9 @@
 package io.github.goooler.golang.tasks
 
 import io.github.goooler.golang.GoBuildMode
+import java.io.File
 import javax.inject.Inject
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
@@ -40,6 +42,8 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
 
   @TaskAction
   public fun compile() {
+    failFast()
+
     val output = outputFile.get().asFile.absolutePath
     val tags = buildTags.get()
     val pkg = packageName.orNull
@@ -64,6 +68,20 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
         spec.args(args)
       }
       .assertNormalExitValue()
+  }
+
+  private fun failFast() {
+    val installTip = "Please install Go: https://go.dev/dl/"
+    val executablePath =
+      executable.orNull
+        ?: throw GradleException("Go is not installed or could not be found. $installTip")
+    val goFile = File(executablePath)
+    val isPath = goFile.isAbsolute || executablePath.contains(File.pathSeparator)
+    if (isPath && !goFile.canExecute()) {
+      throw GradleException(
+        "Go executable not found or not executable at '$executablePath'. $installTip"
+      )
+    }
   }
 
   public companion object {
