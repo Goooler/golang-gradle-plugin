@@ -5,8 +5,7 @@ Thank you for your interest in contributing to golang-gradle-plugin! This guide 
 ## Development Commands
 
 ### Code Style
-- **Check code style**: `./gradlew spotlessCheck`
-- **Format code**: `./gradlew spotlessFormat`
+- **Check and format code style**: `./gradlew spotlessApply`
 
 This project uses [ktfmt](https://github.com/facebook/ktfmt) with Google style for Kotlin code formatting.
 
@@ -43,11 +42,10 @@ When adding new features or APIs:
 
 ### Before Submitting
 Before submitting a pull request:
-1. Run `./gradlew spotlessFormat` to format your code
-2. Run `./gradlew spotlessCheck` to verify code style
-3. Run `./gradlew test` to ensure unit tests pass
-4. Run `./gradlew functionalTest` to ensure integration tests pass
-5. Run `./gradlew checkKotlinAbi` to verify API compatibility
-6. Run `./gradlew lint` to check for lint issues
-7. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
+1. Run `./gradlew spotlessApply` to format your code
+2. Run `./gradlew test` to ensure unit tests pass
+3. Run `./gradlew functionalTest` to ensure integration tests pass
+4. Run `./gradlew checkKotlinAbi` to verify API compatibility
+5. Run `./gradlew lint` to check for lint issues
+6. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the project
 
