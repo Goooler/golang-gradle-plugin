@@ -26,7 +26,7 @@ dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") }
 
 kotlin {
   explicitApi()
-  @OptIn(ExperimentalAbiValidation::class) abiValidation { enabled = true }
+  @OptIn(ExperimentalAbiValidation::class) abiValidation()
   compilerOptions {
     allWarningsAsErrors = true
     // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
