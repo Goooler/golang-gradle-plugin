@@ -3,6 +3,7 @@ package io.github.goooler.golang
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsMatch
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
@@ -34,7 +35,10 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
 
     val result = runWithSuccess("compileGo")
 
-    assertThat(result.output).contains("BUILD SUCCESSFUL")
+    assertThat(result.output).all {
+      containsMatch("Using go version .* for compiling".toRegex())
+      contains("BUILD SUCCESSFUL")
+    }
     val task = result.task(":compileGo")
     assertThat(task).isNotNull()
   }
