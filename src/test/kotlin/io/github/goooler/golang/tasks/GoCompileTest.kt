@@ -154,12 +154,8 @@ class GoCompileTest {
     android.namespace = "com.example.go"
     android.defaultConfig {
       minSdk = 24
-      externalNativeBuild {
-        cmake {
-          abiFilters += "arm64-v8a"
-          abiFilters += "x86"
-        }
-      }
+      ndk.abiFilters += "arm64-v8a"
+      externalNativeBuild { cmake { abiFilters += "x86" } }
     }
 
     project.afterEvaluate {
