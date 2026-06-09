@@ -97,7 +97,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
         spec.standardOutput = outputStream
       }
       .assertNormalExitValue()
-    val version = outputStream.toString().trim()
+    val version = outputStream.use { it.toString().trim() }
     logger.lifecycle("Using $version for compiling")
   }
 
