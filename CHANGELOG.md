@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/Goooler/golang-gradle-plugin/compare/0.2.2...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Prioritize PATH over GOROOT for Go executable resolution.
 
 ## [0.2.2](https://github.com/Goooler/golang-gradle-plugin/releases/tag/0.2.2) - 2026-05-07
 

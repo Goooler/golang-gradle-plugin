@@ -11,6 +11,16 @@ internal fun resolveGoExecutable(providerFactory: ProviderFactory): Provider<Str
     val goName = if (os == OS.WINDOWS) "go.exe" else "go"
 
     val candidates = mutableListOf<File>()
+
+    val pathEnv = providerFactory.environmentVariable("PATH").orNull
+    if (!pathEnv.isNullOrEmpty()) {
+      pathEnv.split(File.pathSeparatorChar).forEach { dir ->
+        if (dir.isNotEmpty()) {
+          candidates.add(File(dir, goName))
+        }
+      }
+    }
+
     if (!goRoot.isNullOrEmpty()) {
       candidates.add(File(goRoot, "bin/$goName"))
     }
