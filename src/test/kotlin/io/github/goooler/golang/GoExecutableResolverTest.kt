@@ -82,7 +82,7 @@ class GoExecutableResolverTest {
       }
 
       override fun environmentVariable(variableName: Provider<String>): Provider<String> {
-        return delegate.provider { envVars[variableName.orNull] }
+        return delegate.provider { envVars[variableName.get()] }
       }
     }
   }
