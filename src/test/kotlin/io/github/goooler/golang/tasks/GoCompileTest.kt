@@ -16,10 +16,13 @@ import com.android.build.api.dsl.LibraryExtension
 import io.github.goooler.golang.GoBuildMode
 import io.github.goooler.golang.GoExtension
 import io.github.goooler.golang.GoPlugin
+import java.io.File
 import kotlin.io.path.Path
+import org.gradle.api.GradleException
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class GoCompileTest {
   @Test
@@ -184,5 +187,24 @@ class GoCompileTest {
     task.workingDir.set(workDir)
 
     assertThat(task.workingDir.get()).isEqualTo(workDir)
+  }
+
+  @Test
+  fun `compile fails fast when executable is not set`() {
+    val project = ProjectBuilder.builder().build()
+    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
+
+    val e = assertThrows<GradleException> { task.compile() }
+    assertThat(e.message).isNotNull().contains("Go is not installed or could not be found")
+  }
+
+  @Test
+  fun `compile fails fast when executable path does not exist`() {
+    val project = ProjectBuilder.builder().build()
+    val task = project.tasks.register("testCompile", GoCompile::class.java).get()
+    task.executable.set("/nonexistent/path/to/go".replace("/", File.pathSeparator))
+
+    val e = assertThrows<GradleException> { task.compile() }
+    assertThat(e.message).isNotNull().contains("not found or not executable")
   }
 }

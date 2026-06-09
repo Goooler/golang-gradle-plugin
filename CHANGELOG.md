@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/Goooler/golang-gradle-plugin/compare/0.2.2...HEAD) - 2026-xx-xx
 
+### Added
+
+- Fail fast if Go is not installed.
+
 ### Changed
 
 - Prioritize `PATH` over `GOROOT` for Go executable resolution.

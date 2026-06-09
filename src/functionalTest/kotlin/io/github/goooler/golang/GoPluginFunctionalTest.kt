@@ -6,6 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import java.io.File
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
@@ -151,5 +152,32 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     val result = runWithSuccess("compileGo")
 
     assertThat(result.task(":compileGo")).isNotNull().transform { it.outcome }.isEqualTo(NO_SOURCE)
+  }
+
+  @Test
+  fun `build fails fast when go executable is not found`() {
+    settingsFile.writeText("")
+    val execPath = "/nonexistent/path/to/go".replace("/", File.pathSeparator)
+    buildFile.writeText(
+      """
+      plugins {
+          id("java")
+          id("io.github.goooler.golang")
+      }
+
+      tasks.named<io.github.goooler.golang.tasks.GoCompile>("compileGo") {
+          executable.set("$execPath")
+      }
+      """
+        .trimIndent()
+    )
+
+    val goFile = projectRoot.resolve("src/main/go/main.go")
+    goFile.createParentDirectories()
+    goFile.writeText("package main\nfunc main() {}")
+
+    val result = runWithFailure("compileGo")
+
+    assertThat(result.output).contains("not found or not executable")
   }
 }
