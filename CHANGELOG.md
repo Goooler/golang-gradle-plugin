@@ -5,6 +5,7 @@
 ### Added
 
 - Fail fast if Go is not installed.
+- Log Go version before `GoCompile` starts.
 
 ### Changed
 

@@ -1,6 +1,7 @@
 package io.github.goooler.golang.tasks
 
 import io.github.goooler.golang.GoBuildMode
+import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.GradleException
@@ -43,6 +44,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
   @TaskAction
   public fun compile() {
     failFast()
+    logGoVersion()
 
     val output = outputFile.get().asFile.absolutePath
     val tags = buildTags.get()
@@ -82,6 +84,19 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
         "Go executable not found or not executable at '$executablePath'. $installTip"
       )
     }
+  }
+
+  private fun logGoVersion() {
+    val outputStream = ByteArrayOutputStream()
+    execOperations
+      .exec { spec ->
+        spec.executable(executable.get())
+        spec.args("version")
+        spec.standardOutput = outputStream
+      }
+      .assertNormalExitValue()
+    val version = outputStream.toString().trim()
+    logger.lifecycle("Using $version for compiling")
   }
 
   public companion object {
