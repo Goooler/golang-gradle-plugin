@@ -36,9 +36,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
     val result = runWithSuccess("compileGo")
 
     assertThat(result.output).all {
-      containsMatch(
-        "Using go version .* for compiling".toRegex()
-      )
+      containsMatch("Using go version .* for compiling".toRegex())
       contains("BUILD SUCCESSFUL")
     }
     val task = result.task(":compileGo")
