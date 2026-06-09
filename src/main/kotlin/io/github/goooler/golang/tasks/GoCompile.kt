@@ -90,7 +90,9 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
     val outputStream = ByteArrayOutputStream()
     execOperations
       .exec { spec ->
+        spec.environment(environment.get())
         spec.executable(executable.get())
+        spec.workingDir(workingDir.get())
         spec.args("version")
         spec.standardOutput = outputStream
       }

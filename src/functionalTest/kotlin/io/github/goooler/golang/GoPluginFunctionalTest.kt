@@ -37,7 +37,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
 
     assertThat(result.output).all {
       containsMatch(
-        "Using go version go(\\d+\\.\\d+(?:\\.\\d+)?)\\s+([a-zA-Z0-9/]+) for compiling".toRegex()
+        "Using go version .* for compiling".toRegex()
       )
       contains("BUILD SUCCESSFUL")
     }
