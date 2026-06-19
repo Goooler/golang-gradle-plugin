@@ -53,10 +53,11 @@ spotless {
   kotlinGradle { ktfmt(libs.ktfmt.get().version).googleStyle() }
 }
 
-val testPluginClasspath by configurations.registering {
-  isCanBeResolved = true
-  description = "Plugins used in integration tests could be resolved in classpath."
-}
+val testPluginClasspath =
+  configurations.register("testPluginClasspath") {
+    isCanBeResolved = true
+    description = "Plugins used in integration tests could be resolved in classpath."
+  }
 
 configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
   attributes.attribute(
@@ -118,7 +119,7 @@ testing.suites {
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
-  val main by getting
+  val main = getByName("main")
   getByName("functionalTest") {
     // Share main's output with functionalTest.
     associateWith(main)
