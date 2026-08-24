@@ -1,12 +1,8 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    'config:recommended',
+    'github>goooler/renovate-config:default.json5',
   ],
-  labels: [
-    'dependencies',
-  ],
-  automerge: true,
   packageRules: [
     {
       groupName: 'Develocity',
@@ -14,26 +10,6 @@
         'com.gradle:develocity-gradle-plugin',
         'com.gradle.develocity:com.gradle.develocity.gradle.plugin',
       ],
-    },
-  ],
-  ignorePresets: [
-    // Ensure we get the latest version and are not pinned to old versions.
-    'workarounds:javaLTSVersions',
-  ],
-  customManagers: [
-    // Update .java-version file with the latest JDK version.
-    {
-      customType: 'regex',
-      managerFilePatterns: [
-        '/\\.java-version$/',
-      ],
-      matchStrings: [
-        '(?<currentValue>.*)\\n',
-      ],
-      datasourceTemplate: 'java-version',
-      depNameTemplate: 'java',
-      // Only write the major version.
-      extractVersionTemplate: '^(?<version>\\d+)',
     },
   ],
 }
