@@ -267,9 +267,9 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         ndkVersion = "$ndkVersion"
         defaultConfig {
           minSdk = 24
+          ndk.abiFilters += "armeabi-v7a"
           externalNativeBuild {
             cmake {
-              abiFilters += "armeabi-v7a"
               abiFilters += "x86_64"
             }
           }
