@@ -81,7 +81,7 @@ public abstract class GoCompile @Inject constructor(private val execOperations: 
     val isPath = goFile.isAbsolute || executablePath.contains(File.pathSeparator)
     if (isPath && !goFile.canExecute()) {
       throw GradleException(
-        "Go executable not found or not executable at '$executablePath'. $installTip"
+        "Go executable not found or not executable at '$executablePath'. $installTip",
       )
     }
   }

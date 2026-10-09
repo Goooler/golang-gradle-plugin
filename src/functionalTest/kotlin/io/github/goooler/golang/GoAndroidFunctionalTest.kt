@@ -28,7 +28,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
     System.getenv("ANDROID_SDK_ROOT")
       ?: System.getenv("ANDROID_HOME")
       ?: error(
-        "SDK path not found. Please set ANDROID_SDK_ROOT or ANDROID_HOME environment variable."
+        "SDK path not found. Please set ANDROID_SDK_ROOT or ANDROID_HOME environment variable.",
       )
 
     val ndkHome =
@@ -36,7 +36,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         ?: System.getenv("ANDROID_NDK_HOME")
         ?: System.getenv("ANDROID_NDK_LATEST_HOME")
         ?: error(
-          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_NDK_LATEST_HOME environment variable."
+          "NDK path not found. Please set ANDROID_NDK, ANDROID_NDK_HOME, or ANDROID_NDK_LATEST_HOME environment variable.",
         )
 
     val propsFile = Path(ndkHome).resolve("source.properties")
@@ -66,7 +66,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         }
       }
       """
-        .trimIndent() + System.lineSeparator()
+        .trimIndent() + System.lineSeparator(),
     )
   }
 
@@ -76,7 +76,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-android-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -94,7 +94,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go file
@@ -111,7 +111,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       func main() {}
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("assembleDebug")
@@ -146,7 +146,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-android-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -164,7 +164,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go file in the golang directory
@@ -181,7 +181,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       func main() {}
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("assembleDebug")
@@ -216,7 +216,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-deps-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -237,7 +237,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       // Simulate CMake tasks that AGP would normally create for each ABI
       tasks.register("buildCMakeDebug[armeabi-v7a]")
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("--dry-run", "buildCMakeDebug[armeabi-v7a]")
@@ -252,7 +252,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-abi-filter-deps-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -282,7 +282,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       }
 
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val cmakeFile = projectRoot.resolve("src/main/cpp/CMakeLists.txt")
@@ -293,7 +293,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       project(dummy)
       add_library(dummy SHARED dummy.cpp)
       """
-        .trimIndent()
+        .trimIndent(),
     )
     projectRoot.resolve("src/main/cpp/dummy.cpp").writeText("int dummy() { return 0; }")
 
@@ -316,7 +316,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-deps-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -337,7 +337,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       // Simulate CMake tasks that AGP would normally create for each ABI
       tasks.register("buildCMakeRelWithDebInfo[armeabi-v7a]")
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("--dry-run", "buildCMakeRelWithDebInfo[armeabi-v7a]")
@@ -352,7 +352,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-flavored-release-deps-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -380,7 +380,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       // Simulate CMake tasks that AGP would normally create for each ABI for demoRelease
       tasks.register("buildCMakeDemoRelWithDebInfo[armeabi-v7a]")
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("--dry-run", "buildCMakeDemoRelWithDebInfo[armeabi-v7a]")
@@ -395,7 +395,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-flavorless-name-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -431,7 +431,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       tasks.register("buildCMakeDebug[x86_64]-2")
       tasks.register("configureCMakeDebug[x86_64]")
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Release CMake tasks without flavor prefix
@@ -477,7 +477,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-variant-isolation-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -517,7 +517,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       tasks.register("configureCMakeDemoDebug[armeabi-v7a]")
       tasks.register("configureCMakeFullDebug[armeabi-v7a]")
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val demoResult = runWithSuccess("--dry-run", "buildCMakeDemoDebug[armeabi-v7a]")
@@ -591,7 +591,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-cmake-flavorless-release-isolation-test"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -627,7 +627,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         dependsOn("buildCMakeRelWithDebInfo[armeabi-v7a]")
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("--dry-run", "triggerMetaRelease")
@@ -643,7 +643,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
       """
       rootProject.name = "go-android-test-flavors"
       """
-        .trimIndent()
+        .trimIndent(),
     )
     buildFile.writeText(
       """
@@ -670,7 +670,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
         }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go file in demo source set
@@ -684,7 +684,7 @@ class GoAndroidFunctionalTest : BaseFunctionalTest() {
 
       func main() {}
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("assembleDemoDebug")

@@ -54,8 +54,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
             .environmentVariable("ANDROID_NDK")
             .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
             .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
-            .map { File(it) }
-        )
+            .map { File(it) },
+        ),
     )
 
   androidComponents.onVariants { variant ->
@@ -75,7 +75,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               task.compilerArgs.convention(
                 goExtension.compilerArgs.map { args ->
                   if (isRelease) args + listOf("-trimpath", "-ldflags", "-s -w") else args
-                }
+                },
               )
               task.executable.convention(goExtension.executable)
               task.workingDir.convention(goExtension.workingDir)
@@ -88,7 +88,7 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                     "GOARM" to arch.toGoArm(),
                     "CC" to arch.toClangPath(ndkDir.asFile, variant.minSdk.apiLevel),
                   )
-                }
+                },
               )
 
               (variant.sources.java ?: variant.sources.kotlin)?.let { sources ->
@@ -116,8 +116,8 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
                   if (!workingDirAdded && selectedDir.exists()) {
                     task.workingDir.convention(
                       goExtension.workingDir.orElse(
-                        layout.projectDirectory.dir(selectedDir.absolutePath)
-                      )
+                        layout.projectDirectory.dir(selectedDir.absolutePath),
+                      ),
                     )
                     workingDirAdded = true
                   }
@@ -126,17 +126,17 @@ internal fun Project.configureAndroidVariants(goExtension: GoExtension) {
               }
 
               task.outputFileName.convention(
-                goExtension.outputFileName.orElse("lib${project.name}.so")
+                goExtension.outputFileName.orElse("lib${project.name}.so"),
               )
               task.outputFile.convention(
                 baseOutputDir.zip(task.outputFileName) { base, fileName ->
                   base.file("${variant.name}/${arch.abi}/$fileName")
-                }
+                },
               )
               task.outputHeaderFile.convention(
                 baseOutputDir.zip(task.outputFileName) { base, fileName ->
                   base.file("${variant.name}/${arch.abi}/${fileName.substringBeforeLast('.')}.h")
-                }
+                },
               )
             }
           arch.abi to task

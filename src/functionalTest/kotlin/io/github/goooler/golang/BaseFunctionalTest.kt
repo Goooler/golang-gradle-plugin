@@ -68,7 +68,7 @@ abstract class BaseFunctionalTest {
           if (warningsAsErrors) {
             add("--warning-mode=fail")
           }
-        }
+        },
       )
       .withProjectDir(projectDir.toFile())
       .apply(block)
