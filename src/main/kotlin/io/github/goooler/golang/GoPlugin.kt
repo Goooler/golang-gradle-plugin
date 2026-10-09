@@ -28,7 +28,7 @@ public abstract class GoPlugin : Plugin<Project> {
                     golangDir.exists() -> golangDir
                     else -> goDir
                   }
-                }
+                },
               )
               filter.include("**/*.go")
             }
@@ -37,8 +37,8 @@ public abstract class GoPlugin : Plugin<Project> {
             task.source(goSourceDirectorySet)
             task.workingDir.convention(
               goExtension.workingDir.orElse(
-                layout.projectDirectory.dir(provider { goSourceDirectorySet.srcDirs.first().path })
-              )
+                layout.projectDirectory.dir(provider { goSourceDirectorySet.srcDirs.first().path }),
+              ),
             )
             task.buildMode.convention(goExtension.buildMode.orElse(GoBuildMode.EXE))
             task.packageName.convention(goExtension.packageName)
@@ -49,12 +49,12 @@ public abstract class GoPlugin : Plugin<Project> {
             task.outputFile.convention(
               baseOutputDir.zip(task.outputFileName) { base, fileName ->
                 base.file("${sourceSet.name}/$fileName")
-              }
+              },
             )
             task.outputHeaderFile.convention(
               baseOutputDir.zip(task.outputFileName) { base, fileName ->
                 base.file("${sourceSet.name}/${fileName.substringBeforeLast('.')}.h")
-              }
+              },
             )
           }
         }

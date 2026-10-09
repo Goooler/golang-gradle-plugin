@@ -25,7 +25,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           id("io.github.goooler.golang")
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go file
@@ -53,7 +53,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           id("io.github.goooler.golang")
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go file in the golang directory
@@ -82,7 +82,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           outputFile.set(layout.buildDirectory.file("custom-output"))
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go file
@@ -115,7 +115,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           buildTags.set(listOf("mytag"))
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Create a dummy go.mod
@@ -129,7 +129,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
       package main
       func main() {}
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val result = runWithSuccess("compileGo")
@@ -149,7 +149,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           id("io.github.goooler.golang")
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     // Don't create any .go files - leave the source directory empty
@@ -173,7 +173,7 @@ class GoPluginFunctionalTest : BaseFunctionalTest() {
           executable.set("$execPath")
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
 
     val goFile = projectRoot.resolve("src/main/go/main.go")
